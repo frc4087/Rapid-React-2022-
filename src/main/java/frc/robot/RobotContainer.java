@@ -4,25 +4,36 @@
 
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.file.Path;
+
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.RamseteController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+
 //import java.util.concurrent.TimeUnit;
 
 //import edu.wpi.first.hal.ConstantsJNI;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.XboxController.Button;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 //import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.BottomFeederActivate;
 import frc.robot.commands.Launch1to2Ball;
 import frc.robot.commands.TopFeederActivate;
-import frc.robot.commands.Tracking;
 import frc.robot.subsystems.BlinkinBase;
 import frc.robot.subsystems.DriveBase;
 import frc.robot.subsystems.FeederBase;
@@ -40,7 +51,7 @@ import frc.robot.subsystems.TurretBase;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   
-   // Initialize joysticks
+  // Initialize joysticks
   public final XboxController driveJoy = new XboxController(0);
   public final XboxController opJoy = new XboxController(1);
   public final JoystickButton aButton = new JoystickButton(opJoy, Constants.kA);
@@ -76,6 +87,9 @@ public class RobotContainer {
   public boolean prevBall,
                  currentBall;
 
+  public SendableChooser<String> autoChooser = new SendableChooser<String>();
+  public Command m_autonomousCommand;
+  public Trajectory trajectory;
 
   // Joystick Methods
   public double getDriveJoy(int axis) {
@@ -106,7 +120,20 @@ public class RobotContainer {
   }
 
   public void roboInit(){
+    autoChooser.addOption("Taxi", "Taxi");
+    autoChooser.addOption("Taxi 1 Ball", "Taxi 1 Ball");
+    autoChooser.addOption("Taxi 2 Ball", "Taxi 2 Ball");
+    autoChooser.addOption("Taxi 3 Ball", "Taxi 3 Ball");
+
+    SmartDashboard.putData("Auto Routine", autoChooser);
+
     aButton.whenHeld(launchCommand());
+  }
+
+  public void autoInit(){
+    if (autoChooser.getSelected() != null){
+      m_autonomousCommand = getAutonomousCommand(autoChooser.getSelected());
+    }
   }
 
   public void telePeroidic(){
@@ -336,8 +363,62 @@ public class RobotContainer {
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
+  public Command getAutonomousCommand(String path) {
+    switch(path){
+    case "Taxi":
+      return pathFollow("output/Taxi.wpilib.json", false);
+    case "Taxi 1 Ball":
+      return new WaitCommand(2)
+            .andThen(pathFollow("output/Taxi.wpilib.json", false));
+    case "Taxi 2 Ball":
+      return pathFollow("output/Taxi.wpilib.json", false)
+            .andThen(pathFollow("output/TaxiRev.wpilib.json", true))
+            .andThen(new WaitCommand(2));
+    case "Taxi 3 Ball":
+      return new WaitCommand(2)
+            .andThen(pathFollow("output/Taxi3.wpilib.json",false))
+            .andThen(new WaitCommand(2))
+            .andThen(pathFollow("output/Taxi3Rev.wpilib.json", true))
+            .andThen(new WaitCommand(2));
+      
+
+    }
     // An ExampleCommand will run in autonomous
     return null;
+  }
+
+
+  
+  public Command pathFollow(String trajectoryJSON, boolean multiPath){
+    try {
+      Path testTrajectory = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
+      trajectory = TrajectoryUtil.fromPathweaverJson(testTrajectory);
+    } catch (final IOException ex) {
+      // TODO Auto-generated catch block
+      DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
+    }
+    //m_drivebase.m_gyro.reset();
+    
+    RamseteCommand ramseteCommand = new RamseteCommand(trajectory,
+                                                    m_DriveBase::getPose,
+                                                    new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
+                                                    new SimpleMotorFeedforward(Constants.ksVolts, 
+                                                                              Constants.kvVoltSecondsPerMeter,
+                                                                              Constants.kaVoltSecondsSquaredPerMeter),
+                                                    Constants.m_driveKinematics,
+                                                    m_DriveBase::getWheelSpeeds,
+                                                    new PIDController(0.1, 0, 0),
+                                                    new PIDController(0.1, 0, 0),
+                                                    m_DriveBase::voltageControl,
+                                                    m_DriveBase);
+    
+    // Run path following command, then stop at the end.
+    // Robot.m_robotContainer.m_driveAuto.m_drive.feed();
+    //m_drivebase.resetOdometry(trajectory.getInitialPose());
+    if (!multiPath){
+      m_DriveBase.resetOdometry(trajectory.getInitialPose());
+    } 
+
+    return ramseteCommand;
   }
 }

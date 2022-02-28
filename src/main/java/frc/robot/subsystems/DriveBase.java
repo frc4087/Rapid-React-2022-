@@ -6,9 +6,15 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 //import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
-
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 //import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,11 +30,16 @@ public class DriveBase extends SubsystemBase {
   public WPI_TalonFX _left3 = new WPI_TalonFX(Constants.L3);
   public WPI_TalonFX _right3 = new WPI_TalonFX(Constants.R3);
 
-  // public MotorControllerGroup _leftMotors = new MotorControllerGroup(_left1, _left2,_left3);
-  // public MotorControllerGroup _rightMotors = new MotorControllerGroup(_right1, _right2,_right3);
+  public double leftEncPos; //= _left1.getSelectedSensorPosition();
+  public double rightEncPos; //= _right1.getSelectedSensorPosition();
+  public double leftEncVel;
+  public double rightEncVel;
 
   public DifferentialDrive m_drive = new DifferentialDrive(_left1, _right1);
 
+  public AHRS m_gyro = new AHRS(SPI.Port.kMXP);
+  
+  public DifferentialDriveOdometry m_odometry;
 
   public DriveBase() {
 
@@ -68,25 +79,67 @@ public class DriveBase extends SubsystemBase {
     // _left2.setNeutralMode(NeutralMode.Coast);
     // _left3.setNeutralMode(NeutralMode.Coast);
 
-    //current limits? we might need ramp rates instead
-    // _left1.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
-    // _left2.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
-    // _left3.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
-    // _right1.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
-    // _right2.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
-    // _right3.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
+    _left1.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
+    _left2.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
+    _left3.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
+    _right1.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
+    _right2.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
+    _right3.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
     
-    //Ramp rates
-    // _left1.configOpenloopRamp(Constants.secondsForOpenRamp);
-    // _left2.configOpenloopRamp(Constants.secondsForOpenRamp);
-    // _left3.configOpenloopRamp(Constants.secondsForOpenRamp);
-    // _right1.configOpenloopRamp(Constants.secondsForOpenRamp);
-    // _right2.configOpenloopRamp(Constants.secondsForOpenRamp);
-    // _right3.configOpenloopRamp(Constants.secondsForOpenRamp);
+    m_odometry = new DifferentialDriveOdometry(getHeading());
+
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    leftEncPos = _left1.getSelectedSensorPosition() * Constants.kEncoderDistancePerPulse;
+    rightEncPos = _right1.getSelectedSensorPosition() * Constants.kEncoderDistancePerPulse;
+    leftEncVel = _left1.getSelectedSensorVelocity() * Constants.kEncoderDistancePerPulse;
+    rightEncVel = _right1.getSelectedSensorVelocity() * Constants.kEncoderDistancePerPulse;
+    
+    m_odometry.update(getHeading(), leftEncPos, rightEncPos);
+  }
+
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {    
+    return new DifferentialDriveWheelSpeeds(leftEncVel, rightEncVel);
+  }
+
+  public Pose2d getPose() {
+    return m_odometry.getPoseMeters();
+  }
+
+  public void resetOdometry(final Pose2d pose) {
+    resetEncoders();
+    m_odometry.resetPosition(pose, getHeading());
+  }
+
+  public void resetEncoders() {
+    leftEncPos = 0;
+    rightEncPos = 0;
+  }
+
+  public void zeroHeading() {
+    m_gyro.reset();
+  }
+
+  public Rotation2d getHeading() {
+    return m_gyro.getRotation2d();
+  }
+  public double getOtherHeading(){
+    return m_gyro.getPitch();
+  }
+
+  public double getAnotherHeading(){
+    return m_gyro.getRoll();
+    }
+  // public double getHeadingActual() {
+  //   return -m_gyro.getYaw() + Math.toDegrees(initTheta());
+  // }`
+
+  public void voltageControl(final double leftVolts, final double rightVolts) {
+    _left1.setVoltage(leftVolts); 
+    _right1.setVoltage(rightVolts);
+    m_drive.feed(); //used to be negative
   }
 }
