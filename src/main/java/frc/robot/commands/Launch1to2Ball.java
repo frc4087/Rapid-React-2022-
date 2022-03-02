@@ -14,15 +14,7 @@ import frc.robot.Robot;
 //import frc.robot.subsystems.LauncherBase;
 
 public class Launch1to2Ball extends CommandBase {
-  // public RobotContainer m_robotContainer = new RobotContainer();
-  // public IntakeBase m_intakeBase = new IntakeBase();
-  // public FeederBase m_FeederBase = new FeederBase();
-  // public LauncherBase m_LauncherBase = new LauncherBase();
-  //DigitalInput beamBreak = new DigitalInput(0);
-  //Debouncer m_debouncer = new Debouncer(0.1, Debouncer.DebounceType.kBoth);
-  // public static int ballCount = 0;
-  // public boolean  prevBall,
-  //                 currentBall;
+
 
   public Launch1to2Ball() {
     // Use addRequirements() here to declare subsystem dependencies.

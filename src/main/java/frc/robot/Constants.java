@@ -48,7 +48,7 @@ public final class Constants {
     public static final double SpeedDivider = 10.0,
                                secondsForOpenRamp = 0.8,
                                CurrentLimmit = 40;
-                               
+
     public final static int kDriveTimeoutMs = 30,
                             kDrivePIDIdx = 0;
     //INTAKE ----------------------------------------------------------------------------------------------------------------------------------
@@ -139,14 +139,14 @@ public final class Constants {
     
     public final static int HALL = 9, //hall effects
                             bean = 0, //beambreak
-                            blink = 7; //blinkin
+                            blink = 4; //blinkin
     
     //AUTO -----------------------------------------------------------------------------------------------------------------------------------
     
     // Characterization Toolsuite Constants
-    public static final double ksVolts = 0.65634, 
-                               kvVoltSecondsPerMeter = 0.1106, 
-                               kaVoltSecondsSquaredPerMeter = 0.095387,
+    public static final double ksVolts = 0.205,//0.65634, 
+                               kvVoltSecondsPerMeter = 2.1,//0.1106, 
+                               kaVoltSecondsSquaredPerMeter = 0.217,//0.095387,
                                kTrackwidthMeters = 0.635,
                                kP = 0.17833, 
                                kD = 0.0, 

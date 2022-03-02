@@ -6,6 +6,11 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -13,6 +18,7 @@ public class FeederBase extends SubsystemBase {
 
 public final CANSparkMax BottomFeederMotor = new CANSparkMax(Constants.BOTTOMFEED, MotorType.kBrushless);
 public final CANSparkMax TopFeederMotor = new CANSparkMax(Constants.TOPFEED, MotorType.kBrushless);
+public final DoubleSolenoid TopFeederBreak = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 6);
 
   
   public FeederBase () {
@@ -25,7 +31,11 @@ public final CANSparkMax TopFeederMotor = new CANSparkMax(Constants.TOPFEED, Mot
 
   @Override
   public void periodic() {
-  
+    if(TopFeederMotor.get()==0)
+      TopFeederBreak.set(Value.kForward);
+    else{
+      TopFeederBreak.set(Value.kReverse);
+    }
   }
 
   public void BottomFeederSet(double velocity){

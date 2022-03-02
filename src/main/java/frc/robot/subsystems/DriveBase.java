@@ -31,8 +31,8 @@ public class DriveBase extends SubsystemBase {
   public WPI_TalonFX _left3 = new WPI_TalonFX(Constants.L3);
   public WPI_TalonFX _right3 = new WPI_TalonFX(Constants.R3);
 
-  public double leftEncPos; //= _left1.getSelectedSensorPosition();
-  public double rightEncPos; //= _right1.getSelectedSensorPosition();
+  public double leftEncPos;
+  public double rightEncPos; 
   public double leftEncVel;
   public double rightEncVel;
 
@@ -61,30 +61,66 @@ public class DriveBase extends SubsystemBase {
 
     _left1.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
     _right1.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
-
+    _left2.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
+    _right2.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
+    _left3.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
+    _right3.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
+    
     _left1.configNominalOutputForward(0,Constants.kDriveTimeoutMs);
     _right1.configNominalOutputForward(0,Constants.kDriveTimeoutMs);
+    _left2.configNominalOutputForward(0,Constants.kDriveTimeoutMs);
+    _right2.configNominalOutputForward(0,Constants.kDriveTimeoutMs);
+    _left3.configNominalOutputForward(0,Constants.kDriveTimeoutMs);
+    _right3.configNominalOutputForward(0,Constants.kDriveTimeoutMs);
 
     _left1.configNominalOutputReverse(0,Constants.kDriveTimeoutMs);
     _right1.configNominalOutputReverse(0,Constants.kDriveTimeoutMs);
+    _left2.configNominalOutputReverse(0,Constants.kDriveTimeoutMs);
+    _right2.configNominalOutputReverse(0,Constants.kDriveTimeoutMs);
+    _left3.configNominalOutputReverse(0,Constants.kDriveTimeoutMs);
+    _right3.configNominalOutputReverse(0,Constants.kDriveTimeoutMs);
 
     _left1.configPeakOutputForward(1,Constants.kDriveTimeoutMs);
     _right1.configPeakOutputForward(1,Constants.kDriveTimeoutMs);
+    _left2.configPeakOutputForward(1,Constants.kDriveTimeoutMs);
+    _right2.configPeakOutputForward(1,Constants.kDriveTimeoutMs);
+    _left3.configPeakOutputForward(1,Constants.kDriveTimeoutMs);
+    _right3.configPeakOutputForward(1,Constants.kDriveTimeoutMs);
 
     _left1.configPeakOutputReverse(-1,Constants.kDriveTimeoutMs);
     _right1.configPeakOutputReverse(-1,Constants.kDriveTimeoutMs);
+    _left2.configPeakOutputReverse(-1,Constants.kDriveTimeoutMs);
+    _right2.configPeakOutputReverse(-1,Constants.kDriveTimeoutMs);
+    _left3.configPeakOutputReverse(-1,Constants.kDriveTimeoutMs);
+    _right3.configPeakOutputReverse(-1,Constants.kDriveTimeoutMs);
 
     _left1.config_kF(Constants.kDrivePIDIdx,Constants.kGains_Vel.kF,Constants.kDriveTimeoutMs);
     _right1.config_kF(Constants.kDrivePIDIdx,Constants.kGains_Vel.kF,Constants.kDriveTimeoutMs);
+    _left2.config_kF(Constants.kDrivePIDIdx,Constants.kGains_Vel.kF,Constants.kDriveTimeoutMs);
+    _right2.config_kF(Constants.kDrivePIDIdx,Constants.kGains_Vel.kF,Constants.kDriveTimeoutMs);
+    _left3.config_kF(Constants.kDrivePIDIdx,Constants.kGains_Vel.kF,Constants.kDriveTimeoutMs);
+    _right3.config_kF(Constants.kDrivePIDIdx,Constants.kGains_Vel.kF,Constants.kDriveTimeoutMs);
 
     _left1.config_kP(Constants.kDrivePIDIdx,Constants.kGains_Vel.kP,Constants.kDriveTimeoutMs);
     _right1.config_kP(Constants.kDrivePIDIdx,Constants.kGains_Vel.kP,Constants.kDriveTimeoutMs);
+    _left2.config_kP(Constants.kDrivePIDIdx,Constants.kGains_Vel.kP,Constants.kDriveTimeoutMs);
+    _right2.config_kP(Constants.kDrivePIDIdx,Constants.kGains_Vel.kP,Constants.kDriveTimeoutMs);
+    _left3.config_kP(Constants.kDrivePIDIdx,Constants.kGains_Vel.kP,Constants.kDriveTimeoutMs);
+    _right3.config_kP(Constants.kDrivePIDIdx,Constants.kGains_Vel.kP,Constants.kDriveTimeoutMs);
 
     _left1.config_kI(Constants.kDrivePIDIdx,Constants.kGains_Vel.kI,Constants.kDriveTimeoutMs);
     _right1.config_kI(Constants.kDrivePIDIdx,Constants.kGains_Vel.kI,Constants.kDriveTimeoutMs);
+    _left2.config_kI(Constants.kDrivePIDIdx,Constants.kGains_Vel.kI,Constants.kDriveTimeoutMs);
+    _right2.config_kI(Constants.kDrivePIDIdx,Constants.kGains_Vel.kI,Constants.kDriveTimeoutMs);
+    _left3.config_kI(Constants.kDrivePIDIdx,Constants.kGains_Vel.kI,Constants.kDriveTimeoutMs);
+    _right3.config_kI(Constants.kDrivePIDIdx,Constants.kGains_Vel.kI,Constants.kDriveTimeoutMs);
 
     _left1.config_kD(Constants.kDrivePIDIdx,Constants.kGains_Vel.kD,Constants.kDriveTimeoutMs);
     _right1.config_kD(Constants.kDrivePIDIdx,Constants.kGains_Vel.kD,Constants.kDriveTimeoutMs);
+    _left2.config_kD(Constants.kDrivePIDIdx,Constants.kGains_Vel.kD,Constants.kDriveTimeoutMs);
+    _right2.config_kD(Constants.kDrivePIDIdx,Constants.kGains_Vel.kD,Constants.kDriveTimeoutMs);
+    _left3.config_kD(Constants.kDrivePIDIdx,Constants.kGains_Vel.kD,Constants.kDriveTimeoutMs);
+    _right3.config_kD(Constants.kDrivePIDIdx,Constants.kGains_Vel.kD,Constants.kDriveTimeoutMs);
     
     //inverts the left motors
     _left1.setInverted(true);    
@@ -123,10 +159,10 @@ public class DriveBase extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    leftEncPos = _left1.getSelectedSensorPosition(); //* Constants.kEncoderDistancePerPulse;
-    rightEncPos = _right1.getSelectedSensorPosition(); //* Constants.kEncoderDistancePerPulse;
-    leftEncVel = _left1.getSelectedSensorVelocity(); //* Constants.kEncoderDistancePerPulse;
-    rightEncVel = _right1.getSelectedSensorVelocity(); //* Constants.kEncoderDistancePerPulse;
+    leftEncPos = _left1.getSelectedSensorPosition() * Constants.kEncoderDistancePerPulse;
+    rightEncPos = _right1.getSelectedSensorPosition() * Constants.kEncoderDistancePerPulse;
+    leftEncVel = _left1.getSelectedSensorVelocity() * Constants.kEncoderDistancePerPulse;
+    rightEncVel = _right1.getSelectedSensorVelocity() * Constants.kEncoderDistancePerPulse;
     
     m_odometry.update(getHeading(), leftEncPos, rightEncPos);
   }
@@ -169,7 +205,7 @@ public class DriveBase extends SubsystemBase {
 
   public void voltageControl(final double leftVolts, final double rightVolts) {
     _left1.setVoltage(leftVolts); 
-    _right1.setVoltage(rightVolts);
-    m_drive.feed(); //used to be negative
+    _right1.setVoltage(rightVolts); //used to be negative
+    m_drive.feed(); 
   }
 }
