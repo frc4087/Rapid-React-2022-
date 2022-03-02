@@ -21,7 +21,6 @@ import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 //import edu.wpi.first.wpilibj.simulation.BatterySim;
@@ -49,18 +48,6 @@ import frc.robot.subsystems.TurretBase;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  
-  // Initialize joysticks
-  public final XboxController driveJoy = new XboxController(0);
-  public final XboxController opJoy = new XboxController(1);
-  public final JoystickButton aButton = new JoystickButton(opJoy, Constants.kA);
-
-  public POVButton right = new POVButton(opJoy, 90);
-  public POVButton downRight = new POVButton(opJoy, 135);
-  public POVButton down = new POVButton(opJoy, 180);
-  public POVButton downLeft = new POVButton(opJoy, 225);
-  public POVButton left = new POVButton(opJoy, 270);
 
   //SUBSYSTEMS
   public final DriveBase m_DriveBase = new DriveBase();
@@ -70,7 +57,6 @@ public class RobotContainer {
   public final LauncherBase m_LauncherBase = new LauncherBase();
   public final BlinkinBase m_BlinkinBase = new BlinkinBase(Constants.blink);
   public final TurretBase m_TurretBase = new TurretBase();
-  public final SlewRateLimiter filter = new SlewRateLimiter(1.0);
 
   //COMMANDS
   public final BottomFeederActivate m_BFA = new BottomFeederActivate();
@@ -81,17 +67,29 @@ public class RobotContainer {
   public double JOY_DEADZONE = 0.1;
   public boolean BButtonToggle = false;
   public static double setpoint;
-  DigitalInput beamBreak = new DigitalInput(0);
-  Debouncer m_debouncer = new Debouncer(0.06, Debouncer.DebounceType.kBoth);
   public static int ballCount = 0;
   public boolean prevBall,
                  currentBall;
 
+  //OTHER
+  public final SlewRateLimiter filter = new SlewRateLimiter(1.0);
+  DigitalInput beamBreak = new DigitalInput(0);
+  Debouncer m_debouncer = new Debouncer(0.06, Debouncer.DebounceType.kBoth);
   public SendableChooser<String> autoChooser = new SendableChooser<String>();
   public Command m_autonomousCommand;
   public Trajectory trajectory;
 
-  // Joystick Methods
+  //JOYSTICKS ---------------------------------------------------------------------------------------------------
+  public final XboxController driveJoy = new XboxController(0);
+  public final XboxController opJoy = new XboxController(1);
+  public final JoystickButton aButton = new JoystickButton(opJoy, Constants.kA);
+
+  public POVButton right = new POVButton(opJoy, 90);
+  public POVButton downRight = new POVButton(opJoy, 135);
+  public POVButton down = new POVButton(opJoy, 180);
+  public POVButton downLeft = new POVButton(opJoy, 225);
+  public POVButton left = new POVButton(opJoy, 270);
+
   public double getDriveJoy(int axis) {
     double raw = driveJoy.getRawAxis(axis);
     return Math.abs(raw) < JOY_DEADZONE ? 0.0 : raw;
@@ -111,6 +109,8 @@ public class RobotContainer {
     double raw = getDriveJoy(Constants.YL);
     return Math.abs(raw) < JOY_DEADZONE ? 0.0 : raw > 0 ? (raw * raw) / 1.5 : (-raw * raw) / 1.5;
   }
+
+  //------------------------------------------------------------------------------------------------------------
   
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -118,6 +118,10 @@ public class RobotContainer {
     configureButtonBindings();
 
   }
+
+  private void configureButtonBindings() {}
+
+  //ROBOT INIT -------------------------------------------------------------------------------------------------
 
   public void roboInit(){
     autoChooser.addOption("Taxi", "Taxi");
@@ -130,11 +134,15 @@ public class RobotContainer {
     aButton.whenHeld(launchCommand());
   }
 
+  //AUTO INIT --------------------------------------------------------------------------------------------------
+
   public void autoInit(){
     if (autoChooser.getSelected() != null){
       m_autonomousCommand = getAutonomousCommand(autoChooser.getSelected());
     }
   }
+
+  //TELEOP PERIODIC --------------------------------------------------------------------------------------------
 
   public void telePeroidic(){
       //m_limeLightBase.periodic(); //updates limelight vars
@@ -256,92 +264,8 @@ public class RobotContainer {
 
     // //TURRET
     //   setpoint = Tracking.turret.turretMotor.getEncoder().getPosition();
-      
-    // //LAUNCH COMMAND
-
-    // if(opJoy.getAButtonPressed()){
-    //   m_Launch12.execute();
-
-    //   if (true){//Robot.m_robotContainer.m_LauncherBase.getRPM() > 700){
-    //     m_TFA.execute();
-    //     ballCount = 0;
-    //     new WaitCommand(1);
-    //     m_BFA.execute();
-        
-    //   }
-
-    // }else if(ballCount < 1){
-    //   m_BFA.execute();
-    // }else if(ballCount >= 1){
-    //   m_BFA.end(true);
-    //   //FeederBase.BottomFeederMotor.set(0);
-    // } else {
-    //   m_Launch12.end(true);
-    //   m_TFA.end(true);
-    //   m_BFA.end(true);
-    // }
-
-  //   if (opJoy.getAButtonPressed()){
-  //     launchCommand().schedule();
-  //     ballCount = 0;
-  //   //   double startTime1 = System.currentTimeMillis(); 
-  //   //   m_Launch12.start();
-
-  //   //   if (System.currentTimeMillis() >=  startTime1 + 1000){
-
-  //   //     double startTime2 = System.currentTimeMillis(); 
-  //   //     m_TFA.execute();
-
-  //   //     if (System.currentTimeMillis() >=  startTime2 + 1000){
-
-  //   //       m_BFA.execute();
-  //   //       ballCount = 0;
-  //   //     }
-  //   //  }
-  //   } else if (!opJoy.getAButtonPressed()){
-  //     //m_Launch12.stop();
-  //    // m_TFA.stop();
-  //     launchCommand().cancel();
-  //    //launchCommand().
-
-  //     if (ballCount >= 1){
-  //       m_BFA.stop();
-  //       //m_BFA.cancel();
-  //     } else {
-  //       m_BFA.execute();
-  //     }
-
-  //  }
-
-       // might have to add a negative
-      
-        // The robot's subsystems and commands are defined here...
-        // public double setpoint = 0;
-      
-      // if(driveJoy.getXButton()){
-  
-      //   //turns the robot right if tx is positive
-      //   if(m_limeLightBase.getTx()>3){
-      //     m_DriveBase.m_drive.arcadeDrive(0,0.3);
-      //     SmartDashboard.putString("Direction", "right");
-      //   } 
-  
-      //   //turns the robot left if tx is negative
-      //     else if(m_limeLightBase.getTx()<-3){
-      //   m_DriveBase.m_drive.arcadeDrive(0,-0.3);
-      //   SmartDashboard.putString("Direction", "left");
-      //   } 
-  
-      //   //does not turn the robot if tx is negligable :)
-      //     else {
-      //   m_DriveBase.m_drive.arcadeDrive(0,0);
-      // }
-  
-      // }
-
-      
-  
     }
+
 
     public Command launchCommand(){
       return new Launch1to2Ball()
@@ -356,7 +280,6 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
-  private void configureButtonBindings() {}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -368,22 +291,19 @@ public class RobotContainer {
     case "Taxi":
       return pathFollow("output/Taxi.wpilib.json", false);
     case "Taxi 1 Ball":
-      return new WaitCommand(2)
+      return launchCommand()
             .andThen(pathFollow("output/Taxi.wpilib.json", false));
     case "Taxi 2 Ball":
       return pathFollow("output/Taxi.wpilib.json", false)
             .andThen(pathFollow("output/TaxiRev.wpilib.json", true))
-            .andThen(new WaitCommand(2));
+            .andThen(launchCommand());
     case "Taxi 3 Ball":
-      return new WaitCommand(2)
-            .andThen(pathFollow("output/Taxi3.wpilib.json",false))
+      return launchCommand()
+            .andThen(pathFollow("output/Taxi3.wpilib.json", false))
             .andThen(new WaitCommand(2))
             .andThen(pathFollow("output/Taxi3Rev.wpilib.json", true))
-            .andThen(new WaitCommand(2));
-      
-
+            .andThen(launchCommand());
     }
-    // An ExampleCommand will run in autonomous
     return null;
   }
 
@@ -403,12 +323,12 @@ public class RobotContainer {
                                                     m_DriveBase::getPose,
                                                     new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta),
                                                     new SimpleMotorFeedforward(Constants.ksVolts, 
-                                                                              Constants.kvVoltSecondsPerMeter,
-                                                                              Constants.kaVoltSecondsSquaredPerMeter),
+                                                                               Constants.kvVoltSecondsPerMeter,
+                                                                               Constants.kaVoltSecondsSquaredPerMeter),
                                                     Constants.m_driveKinematics,
                                                     m_DriveBase::getWheelSpeeds,
-                                                    new PIDController(0.1, 0, 0),
-                                                    new PIDController(0.1, 0, 0),
+                                                    new PIDController(Constants.kP, 0, 0),
+                                                    new PIDController(Constants.kP, 0, 0),
                                                     m_DriveBase::voltageControl,
                                                     m_DriveBase);
     

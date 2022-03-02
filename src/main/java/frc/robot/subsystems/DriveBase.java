@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 //import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 
@@ -50,11 +51,40 @@ public class DriveBase extends SubsystemBase {
 		_right2.configFactoryDefault();
 		_right3.configFactoryDefault();
 
-
     _left2.follow(_left1);
     _left3.follow(_left1);
     _right2.follow(_right1);
     _right3.follow(_right1);
+
+    _left1.configNeutralDeadband(0.001);
+    _right1.configNeutralDeadband(0.001);
+
+    _left1.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
+    _right1.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
+
+    _left1.configNominalOutputForward(0,Constants.kDriveTimeoutMs);
+    _right1.configNominalOutputForward(0,Constants.kDriveTimeoutMs);
+
+    _left1.configNominalOutputReverse(0,Constants.kDriveTimeoutMs);
+    _right1.configNominalOutputReverse(0,Constants.kDriveTimeoutMs);
+
+    _left1.configPeakOutputForward(1,Constants.kDriveTimeoutMs);
+    _right1.configPeakOutputForward(1,Constants.kDriveTimeoutMs);
+
+    _left1.configPeakOutputReverse(-1,Constants.kDriveTimeoutMs);
+    _right1.configPeakOutputReverse(-1,Constants.kDriveTimeoutMs);
+
+    _left1.config_kF(Constants.kDrivePIDIdx,Constants.kGains_Vel.kF,Constants.kDriveTimeoutMs);
+    _right1.config_kF(Constants.kDrivePIDIdx,Constants.kGains_Vel.kF,Constants.kDriveTimeoutMs);
+
+    _left1.config_kP(Constants.kDrivePIDIdx,Constants.kGains_Vel.kP,Constants.kDriveTimeoutMs);
+    _right1.config_kP(Constants.kDrivePIDIdx,Constants.kGains_Vel.kP,Constants.kDriveTimeoutMs);
+
+    _left1.config_kI(Constants.kDrivePIDIdx,Constants.kGains_Vel.kI,Constants.kDriveTimeoutMs);
+    _right1.config_kI(Constants.kDrivePIDIdx,Constants.kGains_Vel.kI,Constants.kDriveTimeoutMs);
+
+    _left1.config_kD(Constants.kDrivePIDIdx,Constants.kGains_Vel.kD,Constants.kDriveTimeoutMs);
+    _right1.config_kD(Constants.kDrivePIDIdx,Constants.kGains_Vel.kD,Constants.kDriveTimeoutMs);
     
     //inverts the left motors
     _left1.setInverted(true);    
@@ -64,7 +94,7 @@ public class DriveBase extends SubsystemBase {
     _right2.setInverted(false);
     _right3.setInverted(false);
     
-    // //sets motor to brake motor
+    //sets motor to brake motor
     _right1.setNeutralMode(NeutralMode.Brake);
     _right2.setNeutralMode(NeutralMode.Brake);
     _right3.setNeutralMode(NeutralMode.Brake);
@@ -93,10 +123,10 @@ public class DriveBase extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    leftEncPos = _left1.getSelectedSensorPosition() * Constants.kEncoderDistancePerPulse;
-    rightEncPos = _right1.getSelectedSensorPosition() * Constants.kEncoderDistancePerPulse;
-    leftEncVel = _left1.getSelectedSensorVelocity() * Constants.kEncoderDistancePerPulse;
-    rightEncVel = _right1.getSelectedSensorVelocity() * Constants.kEncoderDistancePerPulse;
+    leftEncPos = _left1.getSelectedSensorPosition(); //* Constants.kEncoderDistancePerPulse;
+    rightEncPos = _right1.getSelectedSensorPosition(); //* Constants.kEncoderDistancePerPulse;
+    leftEncVel = _left1.getSelectedSensorVelocity(); //* Constants.kEncoderDistancePerPulse;
+    rightEncVel = _right1.getSelectedSensorVelocity(); //* Constants.kEncoderDistancePerPulse;
     
     m_odometry.update(getHeading(), leftEncPos, rightEncPos);
   }

@@ -25,32 +25,32 @@ public class LauncherBase extends SubsystemBase {
     rLaunchMotor.configNeutralDeadband(0.001);
     lLaunchMotor.configNeutralDeadband(0.001);
 
-    rLaunchMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kPIDloopIdx,Constants.kTimeoutMs);
-    lLaunchMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kPIDloopIdx,Constants.kTimeoutMs);
+    rLaunchMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kLaunchPIDIdx,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kLaunchPIDIdx,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.configNominalOutputForward(0,Constants.kTimeoutMs);
-    lLaunchMotor.configNominalOutputForward(0,Constants.kTimeoutMs);
+    rLaunchMotor.configNominalOutputForward(0,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.configNominalOutputForward(0,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.configNominalOutputReverse(0,Constants.kTimeoutMs);
-    lLaunchMotor.configNominalOutputReverse(0,Constants.kTimeoutMs);
+    rLaunchMotor.configNominalOutputReverse(0,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.configNominalOutputReverse(0,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.configPeakOutputForward(1,Constants.kTimeoutMs);
-    lLaunchMotor.configPeakOutputForward(1,Constants.kTimeoutMs);
+    rLaunchMotor.configPeakOutputForward(1,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.configPeakOutputForward(1,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.configPeakOutputReverse(-1,Constants.kTimeoutMs);
-    lLaunchMotor.configPeakOutputReverse(-1,Constants.kTimeoutMs);
+    rLaunchMotor.configPeakOutputReverse(-1,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.configPeakOutputReverse(-1,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.config_kF(Constants.kPIDloopIdx,Constants.kGains_Vel.kF,Constants.kTimeoutMs);
-    lLaunchMotor.config_kF(Constants.kPIDloopIdx,Constants.kGains_Vel.kF,Constants.kTimeoutMs);
+    rLaunchMotor.config_kF(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kF,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.config_kF(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kF,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.config_kF(Constants.kPIDloopIdx,Constants.kGains_Vel.kP,Constants.kTimeoutMs);
-    lLaunchMotor.config_kF(Constants.kPIDloopIdx,Constants.kGains_Vel.kP,Constants.kTimeoutMs);
+    rLaunchMotor.config_kP(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kP,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.config_kP(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kP,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.config_kF(Constants.kPIDloopIdx,Constants.kGains_Vel.kI,Constants.kTimeoutMs);
-    lLaunchMotor.config_kF(Constants.kPIDloopIdx,Constants.kGains_Vel.kI,Constants.kTimeoutMs);
+    rLaunchMotor.config_kI(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kI,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.config_kI(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kI,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.config_kF(Constants.kPIDloopIdx,Constants.kGains_Vel.kD,Constants.kTimeoutMs);
-    lLaunchMotor.config_kF(Constants.kPIDloopIdx,Constants.kGains_Vel.kD,Constants.kTimeoutMs);
+    rLaunchMotor.config_kD(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kD,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.config_kD(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kD,Constants.kLaunchTimeoutMs);
 
     rLaunchMotor.set(ControlMode.PercentOutput, 0);
     lLaunchMotor.set(ControlMode.PercentOutput, 0);

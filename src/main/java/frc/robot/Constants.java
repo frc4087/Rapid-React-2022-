@@ -48,7 +48,9 @@ public final class Constants {
     public static final double SpeedDivider = 10.0,
                                secondsForOpenRamp = 0.8,
                                CurrentLimmit = 40;
-
+                               
+    public final static int kDriveTimeoutMs = 30,
+                            kDrivePIDIdx = 0;
     //INTAKE ----------------------------------------------------------------------------------------------------------------------------------
     
     //Sparks
@@ -88,8 +90,8 @@ public final class Constants {
                             LLAUNCH = 1;
     
     //Config
-    public final static int kTimeoutMs = 30,
-                            kPIDloopIdx = 0;
+    public final static int kLaunchTimeoutMs = 30,
+                            kLaunchPIDIdx = 0;
 
     //PID
     public final static double  kLauncherP = 0,// .0000035,
