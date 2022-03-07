@@ -7,6 +7,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 
 public class BottomFeederActivate extends CommandBase {
   /** Creates a new BottomFeederActivate. */
@@ -37,6 +38,6 @@ public class BottomFeederActivate extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Robot.m_robotContainer.ballCount>=1 && !Robot.m_robotContainer.opJoy.getStartButtonPressed();
+    return RobotContainer.ballCount>=1 && !Robot.m_robotContainer.opJoy.getStartButtonPressed();
   }
 }

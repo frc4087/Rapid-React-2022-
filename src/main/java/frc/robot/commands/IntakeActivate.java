@@ -21,14 +21,12 @@ public class IntakeActivate extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Robot.m_robotContainer.m_IntakeBase.setIntake(-Constants.IMSpeed);
+    Robot.m_robotContainer.m_IntakeBase.IntakeMotor.set(Constants.IMSpeed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    Robot.m_robotContainer.m_IntakeBase.setIntake(0);
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

@@ -10,7 +10,7 @@ import frc.robot.Constants;
 
 public class IntakeBase extends SubsystemBase {
 
-  public final static CANSparkMax IntakeMotor = new CANSparkMax(Constants.INTAKE, MotorType.kBrushless);
+  public final CANSparkMax IntakeMotor = new CANSparkMax(Constants.INTAKE, MotorType.kBrushless);
 
   public DoubleSolenoid intakeSol1 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 0, 7);
   //public DoubleSolenoid intakeSol2 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 6);
