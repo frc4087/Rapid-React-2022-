@@ -18,7 +18,7 @@ public class FeederBase extends SubsystemBase {
 
 public final CANSparkMax BottomFeederMotor = new CANSparkMax(Constants.BOTTOMFEED, MotorType.kBrushless);
 public final CANSparkMax TopFeederMotor = new CANSparkMax(Constants.TOPFEED, MotorType.kBrushless);
-public final DoubleSolenoid TopFeederBreak = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 6);
+public final DoubleSolenoid TopFeederBreak = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 6, 1);
 
   
   public FeederBase () {
@@ -31,9 +31,10 @@ public final DoubleSolenoid TopFeederBreak = new DoubleSolenoid(PneumaticsModule
 
   @Override
   public void periodic() {
-    if(TopFeederMotor.get()==0)
+
+    if(TopFeederMotor.get()==0){
       TopFeederBreak.set(Value.kForward);
-    else{
+    }else{
       TopFeederBreak.set(Value.kReverse);
     }
   }

@@ -75,13 +75,13 @@ public final class Constants {
     public final static int TURR = 6;
 
     //PID
-    public final static double  kTurretP = 0.00725,
-                                kTurretI = 0.000025,
-                                kTurretD = 0.00,
+    public final static double  kTurretP = 0.1,
+                                kTurretI = 0.0,
+                                kTurretD = 0.0,
                                 kTurretFF = 0.0,
                                 kTurretIZ = 0.0;
 
-    public final static double turretPosConFac = ((1/98.0)*360);
+    public final static double turretPosConFac = ((1/70.0)*360);
 
     //LAUNCHER --------------------------------------------------------------------------------------------------------------------------------
     
@@ -132,7 +132,7 @@ public final class Constants {
         return vel / ((2048.0/600.0) * (24.0/36.0));
     }
     
-    public final static Gains kGains_Vel = new Gains (0.3,0.0006,0.2, 0, 0, 0);
+    public final static Gains kGains_Vel = new Gains (0.2, 0, 0, 0, 0, 0);//0.3,0.0006,0.2, 0, 0, 0);
                         
 
     //SENSORS --------------------------------------------------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ public final class Constants {
                                kvVoltSecondsPerMeter = 2.1,//0.1106, 
                                kaVoltSecondsSquaredPerMeter = 0.217,//0.095387,
                                kTrackwidthMeters = 0.635,
-                               kP = 0.17833, 
+                               kP = 5,//0.17833, 
                                kD = 0.0, 
                                kMaxSpeedMetersPerSecond = 4.953,
                                kMaxAccelerationMetersPerSecondSquared = 8.5344,
@@ -157,7 +157,7 @@ public final class Constants {
     
     public static final DifferentialDriveKinematics m_driveKinematics = new DifferentialDriveKinematics(kTrackwidthMeters);
 
-    public static final double kEncoderDistancePerPulse = (4 * Math.PI * 2.54 / 100) / (2048);
-
+    public static final double kEncoderDistancePerPulse = (4 * Math.PI * 2.54 * 9) / (100.0 * 2048 * 64); //gear ratio is 64 to 9
+ 
     public static final boolean kGyroReversed = false;
 }

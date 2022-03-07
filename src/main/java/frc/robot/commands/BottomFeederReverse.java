@@ -8,9 +8,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
-public class BottomFeederActivate extends CommandBase {
+public class BottomFeederReverse extends CommandBase {
   /** Creates a new BottomFeederActivate. */
-  public BottomFeederActivate() {
+  public BottomFeederReverse() {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -21,7 +21,7 @@ public class BottomFeederActivate extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Robot.m_robotContainer.m_FeederBase.BottomFeederMotor.set(Constants.BFMSpeed);
+    Robot.m_robotContainer.m_FeederBase.BottomFeederMotor.set(-Constants.BFMSpeed);
   }
 
   public void stop(){
@@ -37,6 +37,6 @@ public class BottomFeederActivate extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return Robot.m_robotContainer.ballCount>=1 && !Robot.m_robotContainer.opJoy.getStartButtonPressed();
+    return !Robot.m_robotContainer.opJoy.getAButtonPressed();
   }
 }

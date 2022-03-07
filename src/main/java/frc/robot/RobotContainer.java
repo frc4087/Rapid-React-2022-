@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 //import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,6 +36,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.AutoLaunch;
 import frc.robot.commands.BottomFeederActivate;
+import frc.robot.commands.BottomFeederReverse;
+import frc.robot.commands.IntakeActivate;
 import frc.robot.commands.Launch1to2Ball;
 import frc.robot.commands.TopFeederActivate;
 import frc.robot.subsystems.BlinkinBase;
@@ -59,7 +62,7 @@ public class RobotContainer {
   public final IntakeBase m_IntakeBase = new IntakeBase();
   public final LimeLightBase m_LimeLightBase = new LimeLightBase();
   public final LauncherBase m_LauncherBase = new LauncherBase();
-  public final BlinkinBase m_BlinkinBase = new BlinkinBase(Constants.blink);
+  public final BlinkinBase m_blinkinBase = new BlinkinBase(Constants.blink);
   public final TurretBase m_TurretBase = new TurretBase();
 
   //COMMANDS-----------------------------------------------------------------------------------------------------
@@ -87,6 +90,7 @@ public class RobotContainer {
   public final XboxController driveJoy = new XboxController(0);
   public final XboxController opJoy = new XboxController(1);
   public final JoystickButton aButton = new JoystickButton(opJoy, Constants.kA);
+  public final JoystickButton startButton = new JoystickButton(opJoy, Constants.kStart);
 
   public POVButton right = new POVButton(opJoy, 90);
   public POVButton downRight = new POVButton(opJoy, 135);
@@ -136,27 +140,30 @@ public class RobotContainer {
 
     SmartDashboard.putData("Auto Routine", autoChooser);
 
-    aButton.whenHeld(launchCommand());
+    startButton.whenHeld(launchCommand());
+    aButton.whenHeld(ejectBottom());
+  
   }
 
   //AUTO INIT --------------------------------------------------------------------------------------------------
 
   public void autoInit(){
     
-    m_BlinkinBase.set(0.27);
+    m_blinkinBase.set(0.27);
 
     if (autoChooser.getSelected() != null){
       m_autonomousCommand = getAutonomousCommand(autoChooser.getSelected());
+      m_autonomousCommand.schedule();
     }
+
   }
 
   //TELEOP PERIODIC --------------------------------------------------------------------------------------------
 
   public void telePeroidic(){
-      //m_limeLightBase.periodic(); //updates limelight vars
-
-
-    m_BlinkinBase.set(-0.11);
+    //m_limeLightBase.periodic(); //updates limelight vars
+    //m_blinkinBase.set(-0.47);
+    m_blinkinBase.set(0.13);
     prevBall = currentBall;
     currentBall = m_debouncer.calculate(!beamBreak.get());
   
@@ -167,18 +174,18 @@ public class RobotContainer {
         //wait(0.25);
     }
 
-    //BlinkinBase.m_blinkin.set(0.45);
+    //blinkinBase.m_blinkin.set(0.45);
 
     SmartDashboard.putBoolean("Hall Effect", m_TurretBase.getHallEffect());
     SmartDashboard.putNumber("The new ballCount", ballCount);
 
     //DRIVEBASE
-      SmartDashboard.putNumber("Drive Encoder Left", m_DriveBase._left1.getSelectedSensorVelocity());
-      SmartDashboard.putNumber("Drive Encoder Right", m_DriveBase._right1.getSelectedSensorVelocity());
+      SmartDashboard.putNumber("Drive Encoder Left", m_DriveBase.leftEncPos);
+      SmartDashboard.putNumber("Drive Encoder Right", m_DriveBase.rightEncPos);
      
       SmartDashboard.putNumber("Drive PO Left", m_DriveBase._left1.getMotorOutputPercent());
       SmartDashboard.putNumber("Drive PO Right", m_DriveBase._right1.getMotorOutputPercent());
-      
+      SmartDashboard.putNumber("Gyro", m_DriveBase.m_gyro.getYaw());
       SmartDashboard.putNumber("getRPM", m_LauncherBase.getRPM());
       SmartDashboard.putNumber("actual RPM", m_LauncherBase.rLaunchMotor.getSelectedSensorVelocity());
       //Switches between curvature and arcade
@@ -210,7 +217,7 @@ public class RobotContainer {
         //m_IntakeBase.intakeSol2.toggle();
       }
 
-      if (opJoy.getAButton()){
+      if (opJoy.getStartButton()){
         ballCount = 0;
       } else {
         if (ballCount >= 2){
@@ -224,7 +231,7 @@ public class RobotContainer {
      
       m_TurretBase.resetEncoder();
 
-      if (getOpJoy(Constants.XR) == 0.0){
+      //if (getOpJoy(Constants.XR) == 0.0){
         if (right.get()){
           setpoint = 90;
         } else if (downRight.get()){
@@ -237,12 +244,22 @@ public class RobotContainer {
           setpoint = -90;
         }
 
+        // if (setpoint >= 180){
+        //   setpoint = 180;
+        // }else if (setpoint <= -180){
+        //   setpoint = -180;
+        // }else{
+          setpoint -= getOpJoy(Constants.XR)*45;
+        // }
+        
         m_TurretBase.setPos(setpoint);
-      } else {
-        m_TurretBase.turretMotor.set(-getOpJoy(Constants.XR)/25);
-      }
-      
+        //m_TurretBase.turretMotor.set(-getOpJoy(Constants.XR));
      
+       
+        //setpoint = m_TurretBase.turretMotor.getEncoder().getPosition();
+      
+      
+      
 
     //////////////////////////BEWARE THE SEA OF COMMENTS////////////////////////////
 
@@ -258,7 +275,7 @@ public class RobotContainer {
     // //TOP FEEDER
     //    if(opJoy.getYButton()){
     //     m_FeederBase.TopFeederMotor.set(Constants.TFMSpeed);
-    //   } else if(opJoy.getAButton()){
+    //   } else if(opJoy.getStartButton()){
     //     m_FeederBase.TopFeederMotor.set(-Constants.TFMSpeed);
     //   } else {
     //     m_FeederBase.TopFeederMotor.set(0.0);
@@ -277,9 +294,25 @@ public class RobotContainer {
 
 
     public Command launchCommand(){
-      SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
-      SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
-      return new ParallelCommandGroup(m_Launch12, topFeeder, bottomFeeder);
+      // SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
+      // SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
+      // return new ParallelCommandGroup(m_Launch12, topFeeder, bottomFeeder);
+      return new Launch1to2Ball()
+                 .alongWith(new WaitCommand(0.2)
+                 .andThen(new TopFeederActivate()))
+                 .alongWith(new WaitCommand(0.3)
+                 .andThen(new BottomFeederActivate()));
+    }
+
+    // public Command ejectTop(){
+    //   return new Launch1to2Ball()
+    //              .alongWith(new WaitCommand(0.2))
+    //              .andThen(new TopFeederActivate());
+    // }
+
+    public Command ejectBottom(){
+      return new BottomFeederReverse()
+                  .alongWith(new IntakeActivate());
     }
 
     

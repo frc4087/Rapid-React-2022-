@@ -8,7 +8,6 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 //import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.subsystems.FeederBase;
 //import frc.robot.RobotContainer;
 //import frc.robot.subsystems.FeederBase;
 //import frc.robot.subsystems.IntakeBase;
@@ -39,6 +38,7 @@ public class AutoLaunch extends CommandBase {
     @Override
     public void execute() {
         time++;
+        m_LauncherBase.setRPM(750);
     }
 
     // Called once the command ends or is interrupted.

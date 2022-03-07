@@ -22,23 +22,23 @@ public class LauncherBase extends SubsystemBase {
     rLaunchMotor.configFactoryDefault();
     lLaunchMotor.configFactoryDefault();
 
-    rLaunchMotor.configNeutralDeadband(0.001);
-    lLaunchMotor.configNeutralDeadband(0.001);
+    // rLaunchMotor.configNeutralDeadband(0.001);
+    // lLaunchMotor.configNeutralDeadband(0.001);
 
     rLaunchMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kLaunchPIDIdx,Constants.kLaunchTimeoutMs);
     lLaunchMotor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kLaunchPIDIdx,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.configNominalOutputForward(0,Constants.kLaunchTimeoutMs);
-    lLaunchMotor.configNominalOutputForward(0,Constants.kLaunchTimeoutMs);
+    // rLaunchMotor.configNominalOutputForward(0,Constants.kLaunchTimeoutMs);
+    // lLaunchMotor.configNominalOutputForward(0,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.configNominalOutputReverse(0,Constants.kLaunchTimeoutMs);
-    lLaunchMotor.configNominalOutputReverse(0,Constants.kLaunchTimeoutMs);
+    // rLaunchMotor.configNominalOutputReverse(0,Constants.kLaunchTimeoutMs);
+    // lLaunchMotor.configNominalOutputReverse(0,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.configPeakOutputForward(1,Constants.kLaunchTimeoutMs);
-    lLaunchMotor.configPeakOutputForward(1,Constants.kLaunchTimeoutMs);
+    // rLaunchMotor.configPeakOutputForward(1,Constants.kLaunchTimeoutMs);
+    // lLaunchMotor.configPeakOutputForward(1,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.configPeakOutputReverse(-1,Constants.kLaunchTimeoutMs);
-    lLaunchMotor.configPeakOutputReverse(-1,Constants.kLaunchTimeoutMs);
+    // rLaunchMotor.configPeakOutputReverse(-1,Constants.kLaunchTimeoutMs);
+    // lLaunchMotor.configPeakOutputReverse(-1,Constants.kLaunchTimeoutMs);
 
     rLaunchMotor.config_kF(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kF,Constants.kLaunchTimeoutMs);
     lLaunchMotor.config_kF(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kF,Constants.kLaunchTimeoutMs);

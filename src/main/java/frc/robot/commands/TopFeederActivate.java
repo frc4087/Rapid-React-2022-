@@ -39,6 +39,6 @@ public class TopFeederActivate extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return !Robot.m_robotContainer.opJoy.getAButton();
+    return !Robot.m_robotContainer.opJoy.getStartButton();
   }
 }
