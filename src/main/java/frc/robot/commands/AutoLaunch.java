@@ -16,29 +16,29 @@ import frc.robot.subsystems.LauncherBase;
 
 public class AutoLaunch extends CommandBase {
 
-    private final LauncherBase m_LauncherBase;
-    private int time;
-    private double seconds;
+    //private final LauncherBase m_LauncherBase;
+    //private int time;
+    //private double seconds;
 
-    public AutoLaunch(LauncherBase launcherBase, double seconds) {
-        m_LauncherBase = launcherBase;
-        this.seconds = seconds;
+    public AutoLaunch(/*LauncherBase launcherBase, double seconds*/) {
+        //m_LauncherBase = launcherBase;
+        //this.seconds = seconds;
         // Use addRequirements() here to declare subsystem dependencies.
-        addRequirements(launcherBase);
+        //addRequirements(launcherBase);
     }
     
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        time = 0;
-        m_LauncherBase.setRPM(750);
+        //time = 0;
+        //m_LauncherBase.setRPM(750);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        time++;
-        m_LauncherBase.setRPM(750);
+        //time++;
+        Robot.m_robotContainer.m_LauncherBase.setRPM(750);
     }
 
     // Called once the command ends or is interrupted.
@@ -53,6 +53,6 @@ public class AutoLaunch extends CommandBase {
         /*turns the seconds into units of 20ms 
          *because thats how many times execute should have run
          */
-        return time>=seconds*1000/20;
+        return false;//time>=seconds*1000/20;
     }
 }

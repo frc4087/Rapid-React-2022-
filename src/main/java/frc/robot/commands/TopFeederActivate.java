@@ -10,7 +10,10 @@ import frc.robot.Robot;
 
 public class TopFeederActivate extends CommandBase {
   /** Creates a new TopFeederActivate. */
-  public TopFeederActivate() {
+  private boolean isAuto;
+  
+  public TopFeederActivate(Boolean auto) {
+    isAuto = auto;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -39,6 +42,11 @@ public class TopFeederActivate extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return !Robot.m_robotContainer.opJoy.getStartButton();
+    if (isAuto){
+      return false;
+    } else {
+      return !Robot.m_robotContainer.opJoy.getStartButton();
+    }
+    
   }
 }

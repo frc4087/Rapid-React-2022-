@@ -9,8 +9,10 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 
 public class BottomFeederReverse extends CommandBase {
+  
   /** Creates a new BottomFeederActivate. */
   public BottomFeederReverse() {
+    
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -37,6 +39,7 @@ public class BottomFeederReverse extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return !Robot.m_robotContainer.opJoy.getAButtonPressed();
+   return !Robot.m_robotContainer.opJoy.getAButtonPressed();
+    
   }
 }

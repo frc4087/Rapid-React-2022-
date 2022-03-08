@@ -22,13 +22,14 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 //import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -36,6 +37,7 @@ import frc.robot.commands.AutoLaunch;
 import frc.robot.commands.BottomFeederActivate;
 import frc.robot.commands.BottomFeederReverse;
 import frc.robot.commands.IntakeActivate;
+import frc.robot.commands.IntakeReverse;
 import frc.robot.commands.Launch1to2Ball;
 import frc.robot.commands.TopFeederActivate;
 import frc.robot.subsystems.BlinkinBase;
@@ -64,8 +66,8 @@ public class RobotContainer {
   public final TurretBase m_TurretBase = new TurretBase();
 
   //COMMANDS-----------------------------------------------------------------------------------------------------
-  public final BottomFeederActivate m_BFA = new BottomFeederActivate();
-  public final TopFeederActivate m_TFA = new TopFeederActivate();
+  public final BottomFeederActivate m_BFA = new BottomFeederActivate(false);
+  public final TopFeederActivate m_TFA = new TopFeederActivate(false);
   public final Launch1to2Ball m_Launch12 = new Launch1to2Ball();
   
   //VARIABLES----------------------------------------------------------------------------------------------------
@@ -210,6 +212,7 @@ public class RobotContainer {
         m_IntakeBase.IntakeMotor.set(0.0);
       }
 
+
       if(opJoy.getBButtonPressed()){
         m_IntakeBase.intakeSol1.toggle();
         //m_IntakeBase.intakeSol2.toggle();
@@ -221,7 +224,12 @@ public class RobotContainer {
         if (ballCount >= 2){
           m_BFA.stop();
         } else {
-          m_BFA.execute();
+          // if(m_IntakeBase.intakeSol1.get() == Value.kForward){
+          //   m_BFA.stop();
+          // }else{
+            m_BFA.execute();
+          //}
+          
        }
       }
 
@@ -242,13 +250,7 @@ public class RobotContainer {
           setpoint = -90;
         }
 
-        // if (setpoint >= 180){
-        //   setpoint = 180;
-        // }else if (setpoint <= -180){
-        //   setpoint = -180;
-        // }else{
-          setpoint -= getOpJoy(Constants.XR)*45;
-        // }
+       setpoint -= getOpJoy(Constants.XR)*10;
         
         m_TurretBase.setPos(setpoint);
         //m_TurretBase.turretMotor.set(-getOpJoy(Constants.XR));
@@ -297,9 +299,20 @@ public class RobotContainer {
       // return new ParallelCommandGroup(m_Launch12, topFeeder, bottomFeeder);
       return new Launch1to2Ball()
                  .alongWith(new WaitCommand(0.2)
-                 .andThen(new TopFeederActivate()))
+                 .andThen(new TopFeederActivate(false)))
                  .alongWith(new WaitCommand(0.3)
-                 .andThen(new BottomFeederActivate()));
+                 .andThen(new BottomFeederActivate(false)));
+    }
+
+    public Command timedLaunchCommand(double lSeconds, double fSeconds, double bSeconds){
+      // SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
+      // SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
+      // return new ParallelCommandGroup(m_Launch12, topFeeder, bottomFeeder);
+      return new ParallelRaceGroup(new Launch1to2Ball(), new WaitCommand(lSeconds))
+                 .alongWith(new WaitCommand(0.2)
+                 .andThen(new ParallelRaceGroup(new TopFeederActivate(true), new WaitCommand(lSeconds))))
+                 .alongWith(new WaitCommand(0.3)
+                 .andThen(new ParallelRaceGroup(new BottomFeederActivate(true), new WaitCommand(bSeconds))));
     }
 
     // public Command ejectTop(){
@@ -310,15 +323,15 @@ public class RobotContainer {
 
     public Command ejectBottom(){
       return new BottomFeederReverse()
-                  .alongWith(new IntakeActivate());
+                 .alongWith(new IntakeReverse());
     }
 
     
-    public Command autoLaunchCommand(double seconds){
-      SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
-      SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
-      return new ParallelRaceGroup(new AutoLaunch(m_LauncherBase, seconds), topFeeder, bottomFeeder);
-    }
+    // public Command autoLaunchCommand(double seconds){
+    //   SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
+    //   SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
+    //   return new ParallelRaceGroup(new AutoLaunch(m_LauncherBase, seconds), topFeeder, bottomFeeder);
+    // }
    
   
   /**
@@ -338,18 +351,19 @@ public class RobotContainer {
     case "Taxi":
       return pathFollow("output/Taxi.wpilib.json", false);
     case "Taxi 1 Ball":
-      return autoLaunchCommand(2)
+      return timedLaunchCommand(2, 2, 1)
             .andThen(pathFollow("output/Taxi.wpilib.json", false));
     case "Taxi 2 Ball":
-      return pathFollow("output/Taxi.wpilib.json", false)
-            .andThen(pathFollow("output/TaxiRev.wpilib.json", true))
-            .andThen(autoLaunchCommand(2));
+      return new IntakeActivate()
+            .alongWith(pathFollow("output/Taxi.wpilib.json", false)
+            .andThen(pathFollow("output/TaxiRev.wpilib.json", true)
+            .andThen(launchCommand())));
     case "Taxi 3 Ball":
-      return autoLaunchCommand(2)
+      return timedLaunchCommand(2, 2, 1)
             .andThen(pathFollow("output/Taxi3.wpilib.json", false))
             .andThen(new WaitCommand(2))
             .andThen(pathFollow("output/Taxi3Rev.wpilib.json", true))
-            .andThen(autoLaunchCommand(2));
+            .andThen(timedLaunchCommand(2, 2, 1));
     }
     return null;
   }

@@ -17,6 +17,7 @@ public class Launch1to2Ball extends CommandBase {
 
 
   public Launch1to2Ball() {
+    //this.auto = auto;
     // Use addRequirements() here to declare subsystem dependencies.
   }
   

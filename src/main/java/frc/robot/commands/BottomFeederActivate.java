@@ -10,8 +10,10 @@ import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
 public class BottomFeederActivate extends CommandBase {
+  private boolean isAuto;
   /** Creates a new BottomFeederActivate. */
-  public BottomFeederActivate() {
+  public BottomFeederActivate(boolean auto) {
+    isAuto = auto;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -38,6 +40,11 @@ public class BottomFeederActivate extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return RobotContainer.ballCount>=1 && !Robot.m_robotContainer.opJoy.getStartButtonPressed();
-  }
+    if (isAuto){
+      return false;
+    } else {
+      return RobotContainer.ballCount>=1 && !Robot.m_robotContainer.opJoy.getStartButtonPressed();
+  
+    }
+    }
 }
