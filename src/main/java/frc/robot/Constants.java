@@ -133,7 +133,15 @@ public final class Constants {
     }
     
     public final static Gains kGains_Vel = new Gains (0.3, 0, 0, 0, 0, 0);//0.3,0.0006,0.2, 0, 0, 0);
-                        
+      
+    //HANGER 
+
+    public final static int LHANGER = 12,
+                            RHANGER = 13; //Fix this later 
+
+    public final static int HangEncPort1 = 1,
+                            HangEncPort2 = 2; //change
+
 
     //SENSORS --------------------------------------------------------------------------------------------------------------------------------
     
