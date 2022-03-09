@@ -149,6 +149,14 @@ public final class Constants {
                             bean = 0, //beambreak
                             blink = 4; //blinkin
     
+    public static final double  autoIdle = 0.27, //blinkin color palettes
+                                teleOpIdle = 0.13,
+                                strobeGold = -0.07,
+                                green = 0.77,
+                                blue = 0.87,
+                                red = 0.61,
+                                violet = 0.91;
+            
     //AUTO -----------------------------------------------------------------------------------------------------------------------------------
     
     // Characterization Toolsuite Constants
@@ -168,4 +176,7 @@ public final class Constants {
     public static final double kEncoderDistancePerPulse = (4 * Math.PI * 2.54 * 9) / (100.0 * 2048 * 64); //gear ratio is 64 to 9
  
     public static final boolean kGyroReversed = false;
+
+
+
 }

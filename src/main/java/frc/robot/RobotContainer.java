@@ -7,6 +7,8 @@ package frc.robot;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import com.revrobotics.CANSparkMax.SoftLimitDirection;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -28,7 +30,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -41,10 +42,12 @@ import frc.robot.commands.ChangeBallCountBy;
 import frc.robot.commands.IntakeActivate;
 import frc.robot.commands.IntakeReverse;
 import frc.robot.commands.Launch1to2Ball;
+import frc.robot.commands.SetBlinkin;
 import frc.robot.commands.TopFeederActivate;
 import frc.robot.subsystems.BlinkinBase;
 import frc.robot.subsystems.DriveBase;
 import frc.robot.subsystems.FeederBase;
+import frc.robot.subsystems.HangerBase;
 import frc.robot.subsystems.IntakeBase;
 import frc.robot.subsystems.LauncherBase;
 import frc.robot.subsystems.LimeLightBase;
@@ -64,8 +67,9 @@ public class RobotContainer {
   public final IntakeBase m_IntakeBase = new IntakeBase();
   public final LimeLightBase m_LimeLightBase = new LimeLightBase();
   public final LauncherBase m_LauncherBase = new LauncherBase();
-  public final BlinkinBase m_blinkinBase = new BlinkinBase(Constants.blink);
+  public final BlinkinBase m_BlinkinBase = new BlinkinBase(Constants.blink);
   public final TurretBase m_TurretBase = new TurretBase();
+  public final HangerBase m_HangerBase = new HangerBase();
 
   //COMMANDS-----------------------------------------------------------------------------------------------------
   public final BottomFeederActivate m_BFA = new BottomFeederActivate(false);
@@ -153,14 +157,10 @@ public class RobotContainer {
       ballCount = 0;
     } else {
       if (ballCount >= 2){
+        setDankLEDs(Constants.violet, 2);
         m_BFA.stop();
       } else {
-        // if(m_IntakeBase.intakeSol1.get() == Value.kForward){
-        //   m_BFA.stop();
-        // }else{
           m_BFA.execute();
-        //}
-        
      }
     }
   }
@@ -170,7 +170,7 @@ public class RobotContainer {
   public void autoInit(){
     m_IntakeBase.intakeSol1.set(Value.kForward);
     
-    m_blinkinBase.set(0.27);
+    m_BlinkinBase.set(Constants.autoIdle);
 
     if (autoChooser.getSelected() != null){
       m_autonomousCommand = getAutonomousCommand(autoChooser.getSelected());
@@ -183,19 +183,13 @@ public class RobotContainer {
 
   public void telePeroidic(){
     //m_limeLightBase.periodic(); //updates limelight vars
-    //m_blinkinBase.set(-0.47);
-    m_blinkinBase.set(0.13);
     prevBall = currentBall;
     currentBall = m_debouncer.calculate(!beamBreak.get());
   
         //updates the ballcount
     if(prevBall != currentBall && currentBall){
         ballCount++;
-        BlinkinBase.m_blinkin.set(0.85);
-        //wait(0.25);
     }
-
-    //blinkinBase.m_blinkin.set(0.45);
 
     SmartDashboard.putBoolean("Hall Effect", m_TurretBase.getHallEffect());
     SmartDashboard.putNumber("The new ballCount", ballCount);
@@ -213,7 +207,6 @@ public class RobotContainer {
       if (driveJoy.getBButtonPressed()){
         BButtonToggle = !BButtonToggle;
       }
-
 
       if (BButtonToggle) {
         m_DriveBase.m_drive.curvatureDrive(filter.calculate(-getDriveJoy(Constants.YL)), getDriveJoyXR(), driveJoy.getBButtonPressed());
@@ -239,10 +232,7 @@ public class RobotContainer {
         //m_IntakeBase.intakeSol2.toggle();
       }
 
-      
-
-      //TURRET
-     
+      //TURRET     
       m_TurretBase.resetEncoder();
 
       //if (getOpJoy(Constants.XR) == 0.0){
@@ -258,48 +248,17 @@ public class RobotContainer {
           setpoint = -90;
         }
 
-       setpoint -= getOpJoy(Constants.XR)*10;
-        
-        m_TurretBase.setPos(setpoint);
-        //m_TurretBase.turretMotor.set(-getOpJoy(Constants.XR));
-     
-       
-        //setpoint = m_TurretBase.turretMotor.getEncoder().getPosition();
-      
-      
-      
-
-    //////////////////////////BEWARE THE SEA OF COMMENTS////////////////////////////
-
-    // //BOTTOM FEEDER
-    //   if(opJoy.getRightBumper()){
-    //     m_FeederBase.BottomFeederMotor.set(Constants.BFMSpeed);
-    //   } else if(opJoy.getLeftBumper()){
-    //     m_FeederBase.BottomFeederMotor.set(-Constants.BFMSpeed);
-    //   } else {
-    //     m_FeederBase.BottomFeederMotor.set(0.0);
-    //   }
-      
-    // //TOP FEEDER
-    //    if(opJoy.getYButton()){
-    //     m_FeederBase.TopFeederMotor.set(Constants.TFMSpeed);
-    //   } else if(opJoy.getStartButton()){
-    //     m_FeederBase.TopFeederMotor.set(-Constants.TFMSpeed);
-    //   } else {
-    //     m_FeederBase.TopFeederMotor.set(0.0);
-    //   }
-
-    // //LAUNCHER
-    //   if(opJoy.getBButton()){
-    //     m_LauncherBase.setRPM(520); 
-    //   } else{
-    //     m_LauncherBase.setRPM(0);
-    //   }
-
-    // //TURRET
-    //   setpoint = Tracking.turret.turretMotor.getEncoder().getPosition();
+      setpoint -= getOpJoy(Constants.XR)*10;  
+      m_TurretBase.setPos(setpoint);
+    
+      //HANGER
+      m_HangerBase.hangerMotors.set(getOpJoy(Constants.YL));
+      if (m_HangerBase.leftHangerMotor.getEncoder().getPosition() > m_HangerBase.leftHangerMotor.getSoftLimit(SoftLimitDirection.kForward)-2){
+        setDankLEDs(Constants.strobeGold, 2);
+      } else if(m_HangerBase.leftHangerMotor.getEncoder().getPosition() < m_HangerBase.leftHangerMotor.getSoftLimit(SoftLimitDirection.kReverse)+2){
+        setDankLEDs(Constants.green, 2);
+      }
     }
-
 
     public Command launchCommand(){
       // SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
@@ -337,13 +296,10 @@ public class RobotContainer {
                  .alongWith(new ChangeBallCountBy(-1));
     }
 
-    
-    // public Command autoLaunchCommand(double seconds){
-    //   SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
-    //   SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
-    //   return new ParallelRaceGroup(new AutoLaunch(m_LauncherBase, seconds), topFeeder, bottomFeeder);
-    // }
-   
+    public Command setDankLEDs(double pattern, int seconds){
+      return new ParallelRaceGroup(new SetBlinkin(pattern),new WaitCommand(seconds));
+    }
+
   
   /**
    * Use this method to define your button->command mappings. Buttons can be created by
@@ -414,8 +370,6 @@ public class RobotContainer {
     return null;
   }
 
-
-  
   public Command pathFollow(String trajectoryJSON, boolean multiPath){
     try {
       Path testTrajectory = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
@@ -445,7 +399,6 @@ public class RobotContainer {
     if (!multiPath){
       m_DriveBase.resetOdometry(trajectory.getInitialPose());
     } 
-
     return ramseteCommand;
   }
 }
