@@ -116,7 +116,7 @@ public final class Constants {
      */
     public static double rpmToTalonVel(double RPM){
         if(Math.abs(RPM) < 5000){
-            return RPM*(2048.0/600.0) *(24.0/36.0);
+            return RPM*(2048.0/600.0) *(24.0/36.0);//look into this
         } else{
             return 0.0;
         }
@@ -132,7 +132,7 @@ public final class Constants {
         return vel / ((2048.0/600.0) * (24.0/36.0));
     }
     
-    public final static Gains kGains_Vel = new Gains (0.2, 0, 0, 0, 0, 0);//0.3,0.0006,0.2, 0, 0, 0);
+    public final static Gains kGains_Vel = new Gains (0.3, 0, 0, 0, 0, 0);//0.3,0.0006,0.2, 0, 0, 0);
                         
 
     //SENSORS --------------------------------------------------------------------------------------------------------------------------------
@@ -148,7 +148,7 @@ public final class Constants {
                                kvVoltSecondsPerMeter = 2.1,//0.1106, 
                                kaVoltSecondsSquaredPerMeter = 0.217,//0.095387,
                                kTrackwidthMeters = 0.635,
-                               kP = 5,//0.17833, 
+                               kP = 1,//0.17833, 
                                kD = 0.0, 
                                kMaxSpeedMetersPerSecond = 4.953,
                                kMaxAccelerationMetersPerSecondSquared = 8.5344,

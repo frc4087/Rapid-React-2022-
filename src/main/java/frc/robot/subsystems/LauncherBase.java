@@ -86,6 +86,11 @@ public class LauncherBase extends SubsystemBase {
     lLaunchMotor.set(ControlMode.Velocity, Constants.rpmToTalonVel(-RPM));
   }
 
+  public void setPO(double PO){
+    rLaunchMotor.set(ControlMode.PercentOutput, Constants.rpmToTalonVel(-PO));
+    lLaunchMotor.set(ControlMode.PercentOutput, Constants.rpmToTalonVel(-PO));
+  }
+
   public double getRPM(){
     double r = rLaunchMotor.getSelectedSensorVelocity();
     //double l = Constants.talonVelToRPM(lLaunchMotor.getSelectedSensorVelocity());

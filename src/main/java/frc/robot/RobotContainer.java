@@ -34,8 +34,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.AutoLaunch;
+import frc.robot.commands.BeamBreakTriggered;
 import frc.robot.commands.BottomFeederActivate;
 import frc.robot.commands.BottomFeederReverse;
+import frc.robot.commands.ChangeBallCountBy;
 import frc.robot.commands.IntakeActivate;
 import frc.robot.commands.IntakeReverse;
 import frc.robot.commands.Launch1to2Ball;
@@ -80,7 +82,7 @@ public class RobotContainer {
 
   //OTHER--------------------------------------------------------------------------------------------------------
   public final SlewRateLimiter filter = new SlewRateLimiter(1.0);
-  DigitalInput beamBreak = new DigitalInput(0);
+  public DigitalInput beamBreak = new DigitalInput(0);
   Debouncer m_debouncer = new Debouncer(0.06, Debouncer.DebounceType.kBoth);
   public SendableChooser<String> autoChooser = new SendableChooser<String>();
   public Command m_autonomousCommand;
@@ -137,6 +139,7 @@ public class RobotContainer {
     autoChooser.addOption("Taxi 1 Ball", "Taxi 1 Ball");
     autoChooser.addOption("Taxi 2 Ball", "Taxi 2 Ball");
     autoChooser.addOption("Taxi 3 Ball", "Taxi 3 Ball");
+    autoChooser.addOption("Taxi 4 Ball", "Taxi 4 Ball");
 
     SmartDashboard.putData("Auto Routine", autoChooser);
 
@@ -145,9 +148,27 @@ public class RobotContainer {
   
   }
 
+  public void roboPeriodic(){
+    if (m_LauncherBase.rLaunchMotor.get()!=0||opJoy.getStartButton()){
+      ballCount = 0;
+    } else {
+      if (ballCount >= 2){
+        m_BFA.stop();
+      } else {
+        // if(m_IntakeBase.intakeSol1.get() == Value.kForward){
+        //   m_BFA.stop();
+        // }else{
+          m_BFA.execute();
+        //}
+        
+     }
+    }
+  }
+
   //AUTO INIT --------------------------------------------------------------------------------------------------
 
   public void autoInit(){
+    m_IntakeBase.intakeSol1.set(Value.kForward);
     
     m_blinkinBase.set(0.27);
 
@@ -218,20 +239,7 @@ public class RobotContainer {
         //m_IntakeBase.intakeSol2.toggle();
       }
 
-      if (opJoy.getStartButton()){
-        ballCount = 0;
-      } else {
-        if (ballCount >= 2){
-          m_BFA.stop();
-        } else {
-          // if(m_IntakeBase.intakeSol1.get() == Value.kForward){
-          //   m_BFA.stop();
-          // }else{
-            m_BFA.execute();
-          //}
-          
-       }
-      }
+      
 
       //TURRET
      
@@ -308,22 +316,25 @@ public class RobotContainer {
       // SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
       // SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
       // return new ParallelCommandGroup(m_Launch12, topFeeder, bottomFeeder);
-      return new ParallelRaceGroup(new Launch1to2Ball(), new WaitCommand(lSeconds))
-                 .alongWith(new WaitCommand(0.2)
-                 .andThen(new ParallelRaceGroup(new TopFeederActivate(true), new WaitCommand(lSeconds))))
-                 .alongWith(new WaitCommand(0.3)
+      return new ParallelRaceGroup(new AutoLaunch(), new WaitCommand(lSeconds))
+                 .alongWith(new WaitCommand(1)
+                 .andThen(new ParallelRaceGroup(new TopFeederActivate(true), new WaitCommand(fSeconds))))
+                 .alongWith(new WaitCommand(1.5)
                  .andThen(new ParallelRaceGroup(new BottomFeederActivate(true), new WaitCommand(bSeconds))));
     }
 
-    // public Command ejectTop(){
-    //   return new Launch1to2Ball()
-    //              .alongWith(new WaitCommand(0.2))
-    //              .andThen(new TopFeederActivate());
-    // }
+    public Command ejectTop(){
+      return new Launch1to2Ball()
+                 .alongWith(new WaitCommand(0.2))
+                 .andThen(new TopFeederActivate(false))
+                 .alongWith(new ChangeBallCountBy(1));
+      //the ball count should have been set to 0 so we add one after since we on
+    }
 
     public Command ejectBottom(){
       return new BottomFeederReverse()
-                 .alongWith(new IntakeReverse());
+                 .alongWith(new IntakeReverse())
+                 .alongWith(new ChangeBallCountBy(-1));
     }
 
     
@@ -351,19 +362,54 @@ public class RobotContainer {
     case "Taxi":
       return pathFollow("output/Taxi.wpilib.json", false);
     case "Taxi 1 Ball":
-      return timedLaunchCommand(2, 2, 1)
-            .andThen(pathFollow("output/Taxi.wpilib.json", false));
+      return timedLaunchCommand(3, 2, 1.5)
+            .andThen(
+              pathFollow("output/Taxi.wpilib.json", false));
     case "Taxi 2 Ball":
       return new IntakeActivate()
-            .alongWith(pathFollow("output/Taxi.wpilib.json", false)
-            .andThen(pathFollow("output/TaxiRev.wpilib.json", true)
-            .andThen(launchCommand())));
+            .alongWith(
+              new ParallelRaceGroup(
+                new BottomFeederActivate(true), 
+                new BeamBreakTriggered(1)))
+            .alongWith(
+              pathFollow("output/Taxi.wpilib.json", false)
+              .andThen(
+                pathFollow("output/TaxiRev.wpilib.json", true)
+              .andThen(
+                timedLaunchCommand(4.5, 3.5, 3))));
     case "Taxi 3 Ball":
-      return timedLaunchCommand(2, 2, 1)
-            .andThen(pathFollow("output/Taxi3.wpilib.json", false))
-            .andThen(new WaitCommand(2))
-            .andThen(pathFollow("output/Taxi3Rev.wpilib.json", true))
-            .andThen(timedLaunchCommand(2, 2, 1));
+      return new IntakeActivate()
+            .alongWith(timedLaunchCommand(3, 2, 1.5)
+            .andThen(
+              pathFollow("output/Taxi3.wpilib.json", false).alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
+            .andThen(
+              new WaitCommand(0.1))
+            .andThen(
+              pathFollow("output/Taxi3Rev.wpilib.json", true))
+            .andThen(
+              timedLaunchCommand(4.5, 3.5, 3)));
+    case "Taxi 4 Ball":
+      return //Taxi 2 Ball
+            new IntakeActivate()
+              .alongWith(
+                new ParallelRaceGroup(
+                  new BottomFeederActivate(true), 
+                  new BeamBreakTriggered(1))
+              .alongWith(
+                  pathFollow("output/Taxi.wpilib.json", false)
+                .andThen(
+                  pathFollow("output/TaxiRev.wpilib.json", true)
+                .andThen(
+                  timedLaunchCommand(4.5, 3.5, 3))))
+            //Taxi 2 Ball with Long Path
+              .andThen(
+                pathFollow("output/Taxi3.wpilib.json", true).alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
+              .andThen(
+                new WaitCommand(0.1))
+              .andThen(
+                pathFollow("output/Taxi3Rev.wpilib.json", true))
+              .andThen(
+                timedLaunchCommand(4.5, 3.5, 3)));
     }
     return null;
   }

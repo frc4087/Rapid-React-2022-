@@ -38,13 +38,15 @@ public class AutoLaunch extends CommandBase {
     @Override
     public void execute() {
         //time++;
-        Robot.m_robotContainer.m_LauncherBase.setRPM(750);
+        // Robot.m_robotContainer.m_LauncherBase.setRPM(1000);
+        Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted){
-        Robot.m_robotContainer.m_LauncherBase.setRPM(0);
+        // Robot.m_robotContainer.m_LauncherBase.setRPM(0);
+        Robot.m_robotContainer.m_LauncherBase.setPO(0);
     }
 
     // Returns true when the command should end.
