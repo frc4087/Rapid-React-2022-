@@ -22,7 +22,7 @@ public class HangerBase extends SubsystemBase {
   public final CANSparkMax rightHangerMotor = new CANSparkMax(Constants.RHANGER, MotorType.kBrushless);
   public final MotorControllerGroup hangerMotors = new MotorControllerGroup(leftHangerMotor, rightHangerMotor);
  
-  public DoubleSolenoid hangerSol = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 3, 5); //check these ports
+  public DoubleSolenoid hangerSol = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 2, 5); //check these ports
 
   public final Encoder hangEncoder = new Encoder(Constants.HangEncPort1, Constants.HangEncPort2);
   

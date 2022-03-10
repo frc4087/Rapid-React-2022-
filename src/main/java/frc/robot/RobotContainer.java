@@ -96,8 +96,9 @@ public class RobotContainer {
   public final XboxController driveJoy = new XboxController(0);
   public final XboxController opJoy = new XboxController(1);
   public final JoystickButton aButton = new JoystickButton(opJoy, Constants.kA);
+  public final JoystickButton bButton = new JoystickButton(opJoy, Constants.kB);
   public final JoystickButton startButton = new JoystickButton(opJoy, Constants.kStart);
-
+  
   public POVButton right = new POVButton(opJoy, 90);
   public POVButton downRight = new POVButton(opJoy, 135);
   public POVButton down = new POVButton(opJoy, 180);
@@ -149,18 +150,23 @@ public class RobotContainer {
 
     startButton.whenHeld(launchCommand());
     aButton.whenHeld(ejectBottom());
+    bButton.whenHeld(ejectTop());
+
   
   }
 
   public void roboPeriodic(){
     if (m_LauncherBase.rLaunchMotor.get()!=0||opJoy.getStartButton()){
       ballCount = 0;
+      m_IntakeBase.intakeSol1.set(Value.kReverse);
     } else {
       if (ballCount >= 2){
         setDankLEDs(Constants.violet, 2);
         m_BFA.stop();
+      } else if (m_IntakeBase.intakeSol1.get()==Value.kForward){
+        m_BFA.stop();
       } else {
-          m_BFA.execute();
+        m_BFA.execute();
      }
     }
   }
@@ -168,7 +174,7 @@ public class RobotContainer {
   //AUTO INIT --------------------------------------------------------------------------------------------------
 
   public void autoInit(){
-    m_IntakeBase.intakeSol1.set(Value.kForward);
+    //m_IntakeBase.intakeSol1.set(Value.kForward);
     
     m_BlinkinBase.set(Constants.autoIdle);
 
@@ -177,6 +183,10 @@ public class RobotContainer {
       m_autonomousCommand.schedule();
     }
 
+  }
+
+  public void teleopInit(){
+    m_IntakeBase.intakeSol1.set(Value.kReverse);
   }
 
   //TELEOP PERIODIC --------------------------------------------------------------------------------------------
@@ -204,6 +214,7 @@ public class RobotContainer {
       SmartDashboard.putNumber("getRPM", m_LauncherBase.getRPM());
       SmartDashboard.putNumber("actual RPM", m_LauncherBase.rLaunchMotor.getSelectedSensorVelocity());
       //Switches between curvature and arcade
+
       if (driveJoy.getBButtonPressed()){
         BButtonToggle = !BButtonToggle;
       }
@@ -227,10 +238,17 @@ public class RobotContainer {
       }
 
 
+      // if(m_FeederBase.BottomFeederMotor.get()!=0){
+      //   m_IntakeBase.intakeSol1.set(Value.kReverse);
+      // }else{
+        
+      // }
+      
       if(opJoy.getBButtonPressed()){
         m_IntakeBase.intakeSol1.toggle();
         //m_IntakeBase.intakeSol2.toggle();
       }
+      
 
       //TURRET     
       m_TurretBase.resetEncoder();
@@ -264,6 +282,7 @@ public class RobotContainer {
       // SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
       // SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
       // return new ParallelCommandGroup(m_Launch12, topFeeder, bottomFeeder);
+      //m_IntakeBase.intakeSol1.set(Value.kReverse);
       return new Launch1to2Ball()
                  .alongWith(new WaitCommand(0.2)
                  .andThen(new TopFeederActivate(false)))

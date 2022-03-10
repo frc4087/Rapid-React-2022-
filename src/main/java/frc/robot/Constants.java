@@ -132,12 +132,12 @@ public final class Constants {
         return vel / ((2048.0/600.0) * (24.0/36.0));
     }
     
-    public final static Gains kGains_Vel = new Gains (0.3, 0, 0, 0, 0, 0);//0.3,0.0006,0.2, 0, 0, 0);
+    public final static Gains kGains_Vel = new Gains (0.03, 0, 0, 0, 0, 0);//0.3,0.0006,0.2, 0, 0, 0);
       
-    //HANGER 
+    //HANGER----------------------------------------------------------------------------------------------------------------------------------
 
-    public final static int LHANGER = 12,
-                            RHANGER = 13; //Fix this later 
+    public final static int LHANGER = 11,
+                            RHANGER = 12; //Fix this later 
 
     public final static int HangEncPort1 = 1,
                             HangEncPort2 = 2; //change
