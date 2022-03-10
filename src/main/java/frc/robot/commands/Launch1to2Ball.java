@@ -29,7 +29,8 @@ public class Launch1to2Ball extends CommandBase {
   @Override
   public void execute() {
 
-    Robot.m_robotContainer.m_LauncherBase.setRPM(750);
+    //Robot.m_robotContainer.m_LauncherBase.setRPM(750);
+    Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
 
     //   //updates the ball position
     // prevBall = currentBall;
@@ -43,20 +44,12 @@ public class Launch1to2Ball extends CommandBase {
     //IntakeBase.IntakeMotor.set(Constants.IMSpeed);
 
   }
-
-  public void start(){
-    Robot.m_robotContainer.m_LauncherBase.setRPM(750);
-  }
-
-  public void stop(){
-    Robot.m_robotContainer.m_LauncherBase.setRPM(0);
-  }
   
-
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted){
-    Robot.m_robotContainer.m_LauncherBase.setRPM(0);
+    //Robot.m_robotContainer.m_LauncherBase.setRPM(0);
+    Robot.m_robotContainer.m_LauncherBase.setPO(0);
   }
 
   // Returns true when the command should end.
