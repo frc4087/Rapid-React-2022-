@@ -47,7 +47,7 @@ public final class Constants {
     //Drive speed limiters
     public static final double SpeedDivider = 10.0,
                                secondsForOpenRamp = 0.8,
-                               CurrentLimmit = 40;
+                               CurrentLimmit = 30;
 
     public final static int kDriveTimeoutMs = 30,
                             kDrivePIDIdx = 0;

@@ -39,7 +39,7 @@ public class AutoLaunch extends CommandBase {
     public void execute() {
         //time++;
         // Robot.m_robotContainer.m_LauncherBase.setRPM(1000);
-        Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
+        Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
     }
 
     // Called once the command ends or is interrupted.

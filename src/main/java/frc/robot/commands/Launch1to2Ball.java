@@ -30,7 +30,7 @@ public class Launch1to2Ball extends CommandBase {
   public void execute() {
 
     //Robot.m_robotContainer.m_LauncherBase.setRPM(750);
-    Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
+    Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
 
     //   //updates the ball position
     // prevBall = currentBall;

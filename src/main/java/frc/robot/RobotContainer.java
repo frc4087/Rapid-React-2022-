@@ -85,7 +85,7 @@ public class RobotContainer {
                  currentBall;
 
   //OTHER--------------------------------------------------------------------------------------------------------
-  public final SlewRateLimiter filter = new SlewRateLimiter(1.0);
+  public final SlewRateLimiter filter = new SlewRateLimiter(0.8);
   public DigitalInput beamBreak = new DigitalInput(0);
   Debouncer m_debouncer = new Debouncer(0.06, Debouncer.DebounceType.kBoth);
   public SendableChooser<String> autoChooser = new SendableChooser<String>();
@@ -150,7 +150,7 @@ public class RobotContainer {
 
     startButton.whenHeld(launchCommand());
     aButton.whenHeld(ejectBottom());
-    bButton.whenHeld(ejectTop());
+    //bButton.whenHeld(ejectTop());
 
   
   }
@@ -160,6 +160,7 @@ public class RobotContainer {
       ballCount = 0;
       m_IntakeBase.intakeSol1.set(Value.kReverse);
     } else {
+
       if (ballCount >= 2){
         setDankLEDs(Constants.violet, 2);
         m_BFA.stop();
@@ -168,6 +169,7 @@ public class RobotContainer {
       } else {
         m_BFA.execute();
      }
+
     }
   }
 
@@ -271,6 +273,7 @@ public class RobotContainer {
     
       //HANGER
       m_HangerBase.hangerMotors.set(getOpJoy(Constants.YL));
+
       if (m_HangerBase.leftHangerMotor.getEncoder().getPosition() > m_HangerBase.leftHangerMotor.getSoftLimit(SoftLimitDirection.kForward)-2){
         setDankLEDs(Constants.strobeGold, 2);
       } else if(m_HangerBase.leftHangerMotor.getEncoder().getPosition() < m_HangerBase.leftHangerMotor.getSoftLimit(SoftLimitDirection.kReverse)+2){
@@ -284,7 +287,7 @@ public class RobotContainer {
       // return new ParallelCommandGroup(m_Launch12, topFeeder, bottomFeeder);
       //m_IntakeBase.intakeSol1.set(Value.kReverse);
       return new Launch1to2Ball()
-                 .alongWith(new WaitCommand(0.2)
+                 .alongWith(new WaitCommand(0.4)
                  .andThen(new TopFeederActivate(false)))
                  .alongWith(new WaitCommand(0.3)
                  .andThen(new BottomFeederActivate(false)));
@@ -301,22 +304,22 @@ public class RobotContainer {
                  .andThen(new ParallelRaceGroup(new BottomFeederActivate(true), new WaitCommand(bSeconds))));
     }
 
-    public Command ejectTop(){
-      return new Launch1to2Ball()
-                 .alongWith(new WaitCommand(0.2))
-                 .andThen(new TopFeederActivate(false))
-                 .alongWith(new ChangeBallCountBy(1));
-      //the ball count should have been set to 0 so we add one after since we on
-    }
+    // public Command ejectTop(){
+    //   return new Launch1to2Ball()
+    //              .alongWith(new WaitCommand(0.2))
+    //              .andThen(new TopFeederActivate(false))
+    //              .alongWith(new ChangeBallCountBy(1));
+    //   //the ball count should have been set to 0 so we add one after since we on
+    // }
 
     public Command ejectBottom(){
       return new BottomFeederReverse()
                  .alongWith(new IntakeReverse())
-                 .alongWith(new ChangeBallCountBy(-1));
+                 .alongWith(new ParallelRaceGroup(new ChangeBallCountBy(-1), new WaitCommand(0.02)));
     }
 
     public Command setDankLEDs(double pattern, int seconds){
-      return new ParallelRaceGroup(new SetBlinkin(pattern),new WaitCommand(seconds));
+      return new ParallelRaceGroup(new SetBlinkin(pattern), new WaitCommand(seconds));
     }
 
   
