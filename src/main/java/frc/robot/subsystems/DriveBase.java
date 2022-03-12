@@ -44,12 +44,12 @@ public class DriveBase extends SubsystemBase {
 
   public DriveBase() {
 
-    _left1.configFactoryDefault();
-		_left2.configFactoryDefault();
-		_left3.configFactoryDefault();
-		_right1.configFactoryDefault();
-		_right2.configFactoryDefault();
-		_right3.configFactoryDefault();
+    // _left1.configFactoryDefault();
+		// _left2.configFactoryDefault();
+		// _left3.configFactoryDefault();
+		// _right1.configFactoryDefault();
+		// _right2.configFactoryDefault();
+		// _right3.configFactoryDefault();
 
     _left2.follow(_left1);
     _left3.follow(_left1);
@@ -61,10 +61,10 @@ public class DriveBase extends SubsystemBase {
 
     _left1.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
     _right1.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
-    _left2.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
-    _right2.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
-    _left3.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
-    _right3.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
+    // _left2.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
+    // _right2.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
+    // _left3.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
+    // _right3.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor,Constants.kDrivePIDIdx,Constants.kDriveTimeoutMs);
     
     // _left1.configNominalOutputForward(0,Constants.kDriveTimeoutMs);
     // _right1.configNominalOutputForward(0,Constants.kDriveTimeoutMs);
@@ -153,6 +153,43 @@ public class DriveBase extends SubsystemBase {
     _right3.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, Constants.CurrentLimmit, 25, Constants.secondsForOpenRamp));
     
     m_odometry = new DifferentialDriveOdometry(getHeading());
+
+    _left1.setStatusFramePeriod(1, 20);
+    _right1.setStatusFramePeriod(1, 20);
+    _left2.setStatusFramePeriod(1, 20);
+    _right2.setStatusFramePeriod(1, 20);
+    _left3.setStatusFramePeriod(1, 20);
+    _right3.setStatusFramePeriod(1, 20);
+
+    _left1.setStatusFramePeriod(3, 13100);
+    _right1.setStatusFramePeriod(3, 13200);
+    _left2.setStatusFramePeriod(3, 13300);
+    _right2.setStatusFramePeriod(3, 13400);
+    _left3.setStatusFramePeriod(3, 13500);
+    _right3.setStatusFramePeriod(3, 13600);
+
+    _left1.setStatusFramePeriod(4, 17100);
+    _right1.setStatusFramePeriod(4, 17200);
+    _left2.setStatusFramePeriod(4, 17300);
+    _right2.setStatusFramePeriod(4, 17400);
+    _left3.setStatusFramePeriod(4, 17500);
+    _right3.setStatusFramePeriod(4, 17600);
+
+    _left1.setStatusFramePeriod(8, 19100);
+    _right1.setStatusFramePeriod(8, 19200);
+    _left2.setStatusFramePeriod(8, 19300);
+    _right2.setStatusFramePeriod(8, 19400);
+    _left3.setStatusFramePeriod(8, 19500);
+    _right3.setStatusFramePeriod(8, 19600);
+
+    _left1.setStatusFramePeriod(14, 23100);
+    _right1.setStatusFramePeriod(14, 23200);
+    _left2.setStatusFramePeriod(14, 23300);
+    _right2.setStatusFramePeriod(14, 23400);
+    _left3.setStatusFramePeriod(14, 23500);
+    _right3.setStatusFramePeriod(14, 23600);
+
+
 
   }
 

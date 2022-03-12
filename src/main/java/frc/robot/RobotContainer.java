@@ -75,11 +75,13 @@ public class RobotContainer {
   public final BottomFeederActivate m_BFA = new BottomFeederActivate(false);
   public final TopFeederActivate m_TFA = new TopFeederActivate(false);
   public final Launch1to2Ball m_Launch12 = new Launch1to2Ball();
+  //public final Command m_SetBlink = new SetBlinkin(Constants.teleOpIdle);
   
   //VARIABLES----------------------------------------------------------------------------------------------------
   public double JOY_DEADZONE = 0.1;
   public boolean BButtonToggle = false;
   public static double setpoint;
+  public static double blinkPattern = Constants.autoIdle;
   public static int ballCount = 0;
   public boolean prevBall,
                  currentBall;
@@ -156,6 +158,8 @@ public class RobotContainer {
   }
 
   public void roboPeriodic(){
+      //LEDS
+      setDankLEDs(blinkPattern,2);
     if (m_LauncherBase.rLaunchMotor.get()!=0||opJoy.getStartButton()){
       ballCount = 0;
       m_IntakeBase.intakeSol1.set(Value.kReverse);
@@ -177,9 +181,9 @@ public class RobotContainer {
 
   public void autoInit(){
     //m_IntakeBase.intakeSol1.set(Value.kForward);
-    
-    m_BlinkinBase.set(Constants.autoIdle);
-
+    //m_BlinkinBase.set(Constants.autoIdle);
+    blinkPattern = Constants.autoIdle;
+    setDankLEDs(blinkPattern, 300).schedule(); //CHANGE SECONDS
     if (autoChooser.getSelected() != null){
       m_autonomousCommand = getAutonomousCommand(autoChooser.getSelected());
       m_autonomousCommand.schedule();
@@ -188,6 +192,7 @@ public class RobotContainer {
   }
 
   public void teleopInit(){
+    blinkPattern = Constants.violet;
     m_IntakeBase.intakeSol1.set(Value.kReverse);
   }
 
@@ -195,12 +200,14 @@ public class RobotContainer {
 
   public void telePeroidic(){
     //m_limeLightBase.periodic(); //updates limelight vars
+    blinkPattern = Constants.teleOpIdle;
     prevBall = currentBall;
     currentBall = m_debouncer.calculate(!beamBreak.get());
   
         //updates the ballcount
     if(prevBall != currentBall && currentBall){
         ballCount++;
+        blinkPattern = Constants.green;
     }
 
     SmartDashboard.putBoolean("Hall Effect", m_TurretBase.getHallEffect());
@@ -275,10 +282,12 @@ public class RobotContainer {
       m_HangerBase.hangerMotors.set(getOpJoy(Constants.YL));
 
       if (m_HangerBase.leftHangerMotor.getEncoder().getPosition() > m_HangerBase.leftHangerMotor.getSoftLimit(SoftLimitDirection.kForward)-2){
-        setDankLEDs(Constants.strobeGold, 2);
+        //blinkPattern = Constants.strobeGold;
       } else if(m_HangerBase.leftHangerMotor.getEncoder().getPosition() < m_HangerBase.leftHangerMotor.getSoftLimit(SoftLimitDirection.kReverse)+2){
-        setDankLEDs(Constants.green, 2);
+        //blinkPattern = Constants.green;
       }
+
+
     }
 
     public Command launchCommand(){

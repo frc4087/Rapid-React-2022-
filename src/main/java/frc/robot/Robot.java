@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -33,7 +34,6 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     m_robotContainer.roboInit();
     c.enableDigital();
-    
     CameraServer.startAutomaticCapture();
     
   }
@@ -88,7 +88,7 @@ public class Robot extends TimedRobot {
     if (m_robotContainer.m_autonomousCommand != null) {
       m_robotContainer.m_autonomousCommand.cancel();
     }
-    m_robotContainer.m_BlinkinBase.set(Constants.teleOpIdle);
+
     m_robotContainer.teleopInit();
     RobotContainer.ballCount = 0;
     RobotContainer.setpoint = 0;
