@@ -5,15 +5,11 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Robot;
+import frc.robot.RobotContainer;
 
-public class SetBlinkin extends CommandBase {
-  /** Creates a new SetBlinkin. */
-  public double pattern;
-  
-  public SetBlinkin(double _pattern ) {
-    pattern = _pattern;
-
+public class TurnTurretForHanger extends CommandBase {
+  /** Creates a new TurnTurretForHanger. */
+  public TurnTurretForHanger() {
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -24,13 +20,13 @@ public class SetBlinkin extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    Robot.m_robotContainer.m_BlinkinBase.set(pattern);
+    RobotContainer.setpoint = 90;
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-   // Robot.m_robotContainer.m_BlinkinBase.set(Constants.teleOpIdle);
+    RobotContainer.setpoint = 90;
   }
 
   // Returns true when the command should end.
