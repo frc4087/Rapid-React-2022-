@@ -34,7 +34,7 @@ public class TurretBase extends SubsystemBase {
                                                                              // rotation
     turretMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
     turretMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
-    turretMotor.setSoftLimit(SoftLimitDirection.kForward, 90);
+    turretMotor.setSoftLimit(SoftLimitDirection.kForward, 10);
     turretMotor.setSoftLimit(SoftLimitDirection.kReverse, -90);
   }
 
@@ -46,7 +46,6 @@ public class TurretBase extends SubsystemBase {
     if (getHallEffect()){
       turretMotor.getEncoder().setPosition(0);
     }
-
   }
 
   @Override

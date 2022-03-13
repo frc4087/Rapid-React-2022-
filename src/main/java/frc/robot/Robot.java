@@ -88,7 +88,7 @@ public class Robot extends TimedRobot {
     if (m_robotContainer.m_autonomousCommand != null) {
       m_robotContainer.m_autonomousCommand.cancel();
     }
-
+    m_robotContainer.m_BlinkinBase.set(Constants.teleOpIdle);
     m_robotContainer.teleopInit();
     RobotContainer.ballCount = 0;
     RobotContainer.setpoint = 0;

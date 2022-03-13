@@ -77,14 +77,15 @@ public class RobotContainer {
   public final Launch1to2Ball m_Launch12 = new Launch1to2Ball();
   //public final Command m_SetBlink = new SetBlinkin(Constants.teleOpIdle);
   
-  //VARIABLES----------------------------------------------------------------------------------------------------
-  public double JOY_DEADZONE = 0.1;
-  public boolean BButtonToggle = false;
-  public static double setpoint;
-  public static double blinkPattern = Constants.autoIdle;
+  //VARIABLES---------------------------------------------------------------------------------------------------- 
+  public boolean  BButtonToggle = false,
+                  YButtonToggle = false,
+                  prevBall,
+                  currentBall;
+  public static double  setpoint,
+                        blinkPattern = Constants.autoIdle,
+                        JOY_DEADZONE = 0.1;
   public static int ballCount = 0;
-  public boolean prevBall,
-                 currentBall;
 
   //OTHER--------------------------------------------------------------------------------------------------------
   public final SlewRateLimiter filter = new SlewRateLimiter(0.8);
@@ -95,18 +96,20 @@ public class RobotContainer {
   public Trajectory trajectory;
 
   //JOYSTICKS ---------------------------------------------------------------------------------------------------
-  public final XboxController driveJoy = new XboxController(0);
-  public final XboxController opJoy = new XboxController(1);
-  public final JoystickButton aButton = new JoystickButton(opJoy, Constants.kA);
-  public final JoystickButton bButton = new JoystickButton(opJoy, Constants.kB);
-  public final JoystickButton startButton = new JoystickButton(opJoy, Constants.kStart);
+  public final XboxController driveJoy = new XboxController(0),
+                              opJoy = new XboxController(1);
+  public final JoystickButton aButton = new JoystickButton(opJoy, Constants.kA),
+                              bButton = new JoystickButton(opJoy, Constants.kB),
+                              yButton = new JoystickButton(opJoy, Constants.kY),
+                              startButton = new JoystickButton(opJoy, Constants.kStart);
   
-  public POVButton right = new POVButton(opJoy, 90);
-  public POVButton downRight = new POVButton(opJoy, 135);
-  public POVButton down = new POVButton(opJoy, 180);
-  public POVButton downLeft = new POVButton(opJoy, 225);
-  public POVButton left = new POVButton(opJoy, 270);
+  public POVButton  right = new POVButton(opJoy, 90),
+                    downRight = new POVButton(opJoy, 135),
+                    down = new POVButton(opJoy, 180),
+                    downLeft = new POVButton(opJoy, 225),
+                    left = new POVButton(opJoy, 270);
 
+    //returns the joystick values from -1 to 1, implements a deadzone around zero to prevent drift
   public double getDriveJoy(int axis) {
     double raw = driveJoy.getRawAxis(axis);
     return Math.abs(raw) < JOY_DEADZONE ? 0.0 : raw;
@@ -142,6 +145,7 @@ public class RobotContainer {
   //ROBOT INIT -------------------------------------------------------------------------------------------------
 
   public void roboInit(){
+      //autonomous paths 
     autoChooser.addOption("Taxi", "Taxi");
     autoChooser.addOption("Taxi 1 Ball", "Taxi 1 Ball");
     autoChooser.addOption("Taxi 2 Ball", "Taxi 2 Ball");
@@ -153,13 +157,12 @@ public class RobotContainer {
     startButton.whenHeld(launchCommand());
     aButton.whenHeld(ejectBottom());
     //bButton.whenHeld(ejectTop());
-
-  
+    m_HangerBase.hangerSol.set(Value.kForward);
   }
 
   public void roboPeriodic(){
       //LEDS
-      setDankLEDs(blinkPattern,2);
+      setDankLEDs(blinkPattern, 0.002);
     if (m_LauncherBase.rLaunchMotor.get()!=0||opJoy.getStartButton()){
       ballCount = 0;
       m_IntakeBase.intakeSol1.set(Value.kReverse);
@@ -192,7 +195,7 @@ public class RobotContainer {
   }
 
   public void teleopInit(){
-    blinkPattern = Constants.violet;
+
     m_IntakeBase.intakeSol1.set(Value.kReverse);
   }
 
@@ -200,11 +203,11 @@ public class RobotContainer {
 
   public void telePeroidic(){
     //m_limeLightBase.periodic(); //updates limelight vars
-    blinkPattern = Constants.teleOpIdle;
+    blinkPattern = Constants.violet; //teleOpIdle
     prevBall = currentBall;
     currentBall = m_debouncer.calculate(!beamBreak.get());
   
-        //updates the ballcount
+      //updates the ballcount
     if(prevBall != currentBall && currentBall){
         ballCount++;
         blinkPattern = Constants.green;
@@ -278,17 +281,31 @@ public class RobotContainer {
       setpoint -= getOpJoy(Constants.XR)*10;  
       m_TurretBase.setPos(setpoint);
     
-      //HANGER
-      m_HangerBase.hangerMotors.set(getOpJoy(Constants.YL));
-
-      if (m_HangerBase.leftHangerMotor.getEncoder().getPosition() > m_HangerBase.leftHangerMotor.getSoftLimit(SoftLimitDirection.kForward)-2){
-        //blinkPattern = Constants.strobeGold;
-      } else if(m_HangerBase.leftHangerMotor.getEncoder().getPosition() < m_HangerBase.leftHangerMotor.getSoftLimit(SoftLimitDirection.kReverse)+2){
-        //blinkPattern = Constants.green;
+      if(opJoy.getLeftBumper()){
+        blinkPattern = Constants.strobeGold;
+        setpoint = -90;
+        m_HangerBase.hangerMotors.set(0.9);
+      } else if(opJoy.getRightBumper()){
+        setpoint = -90;
+        blinkPattern = Constants.green;
+        m_HangerBase.hangerMotors.set(-0.9);
+      } else{
+        m_HangerBase.hangerMotors.set(0);
       }
 
-
+      if(opJoy.getYButtonPressed()){
+        m_HangerBase.hangerSol.toggle(); 
+      }
+        //UNCOMMENT ONCE SOFT LIMITS SET, DON'T DELETE (JUST YET)
+      // if (m_HangerBase.leftHangerMotor.getEncoder().getPosition() > m_HangerBase.leftHangerMotor.getSoftLimit(SoftLimitDirection.kForward)-2){
+      //   //blinkPattern = Constants.strobeGold;
+      // } else if(m_HangerBase.leftHangerMotor.getEncoder().getPosition() < m_HangerBase.leftHangerMotor.getSoftLimit(SoftLimitDirection.kReverse)+2){
+      //   //blinkPattern = Constants.green;
+      // }
+      m_BlinkinBase.set(blinkPattern);
     }
+
+  //COMMANDS METHODS --------------------------------------------------------------------------------------------
 
     public Command launchCommand(){
       // SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
@@ -327,8 +344,8 @@ public class RobotContainer {
                  .alongWith(new ParallelRaceGroup(new ChangeBallCountBy(-1), new WaitCommand(0.02)));
     }
 
-    public Command setDankLEDs(double pattern, int seconds){
-      return new ParallelRaceGroup(new SetBlinkin(pattern), new WaitCommand(seconds));
+    public Command setDankLEDs(double pattern, double d){
+      return new ParallelRaceGroup(new SetBlinkin(pattern), new WaitCommand(d));
     }
 
   

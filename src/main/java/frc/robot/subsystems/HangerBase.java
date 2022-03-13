@@ -28,17 +28,22 @@ public class HangerBase extends SubsystemBase {
   
   public HangerBase() {
     leftHangerMotor.setIdleMode(IdleMode.kBrake);
-    rightHangerMotor.setSmartCurrentLimit(30);
-    // rightHangerMotor.setInverted(true);
-    // leftHangerMotor.setInverted(false);
-    leftHangerMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
-    leftHangerMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
-    leftHangerMotor.setSoftLimit(SoftLimitDirection.kForward, 10);
-    leftHangerMotor.setSoftLimit(SoftLimitDirection.kReverse, -10);
-    rightHangerMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
-    rightHangerMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
-    rightHangerMotor.setSoftLimit(SoftLimitDirection.kForward, 10);
-    rightHangerMotor.setSoftLimit(SoftLimitDirection.kReverse, -10);
+    rightHangerMotor.setIdleMode(IdleMode.kBrake);
+    
+    leftHangerMotor.setInverted(true);
+    rightHangerMotor.setInverted(false);
+    
+    rightHangerMotor.setSmartCurrentLimit(40);
+    leftHangerMotor.setSmartCurrentLimit(40);
+    
+    //leftHangerMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+    // leftHangerMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+    // leftHangerMotor.setSoftLimit(SoftLimitDirection.kForward, 100);
+    // leftHangerMotor.setSoftLimit(SoftLimitDirection.kReverse, -100);
+    //rightHangerMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+    // rightHangerMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+    // rightHangerMotor.setSoftLimit(SoftLimitDirection.kForward, 100);
+    // rightHangerMotor.setSoftLimit(SoftLimitDirection.kReverse, -100);
   }
 
   @Override
