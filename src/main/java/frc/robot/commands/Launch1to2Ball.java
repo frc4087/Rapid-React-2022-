@@ -14,9 +14,9 @@ import frc.robot.Robot;
 //import frc.robot.subsystems.LauncherBase;
 
 public class Launch1to2Ball extends CommandBase {
-
-
-  public Launch1to2Ball() {
+  public boolean isShootingLow;
+  public Launch1to2Ball(boolean _isShootingLow) {
+    isShootingLow = _isShootingLow;
     //this.auto = auto;
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -30,8 +30,11 @@ public class Launch1to2Ball extends CommandBase {
   public void execute() {
 
     //Robot.m_robotContainer.m_LauncherBase.setRPM(750);
+    if(isShootingLow == true){
     Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
-
+    } else{
+      Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
+    }
     //   //updates the ball position
     // prevBall = currentBall;
     // currentBall = m_debouncer.calculate(!beamBreak.get());
@@ -55,6 +58,6 @@ public class Launch1to2Ball extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return !Robot.m_robotContainer.opJoy.getStartButton();
+      return !Robot.m_robotContainer.opJoy.getStartButton() && !Robot.m_robotContainer.opJoy.getXButton();
   }
 }

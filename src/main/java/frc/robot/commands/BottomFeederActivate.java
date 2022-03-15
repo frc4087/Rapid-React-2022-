@@ -30,6 +30,11 @@ public class BottomFeederActivate extends CommandBase {
   public void stop(){
     Robot.m_robotContainer.m_FeederBase.BottomFeederMotor.set(0);
   }
+
+  public void reverse(){
+    Robot.m_robotContainer.m_FeederBase.BottomFeederMotor.set(-Constants.BFMSpeed);
+  }
+  
   
   // Called once the command ends or is interrupted.
   @Override
@@ -43,7 +48,7 @@ public class BottomFeederActivate extends CommandBase {
     if (isAuto){
       return false;
     } else {
-      return RobotContainer.ballCount>=1 && !Robot.m_robotContainer.opJoy.getStartButtonPressed();
+      return RobotContainer.ballCount>=1 && (!Robot.m_robotContainer.opJoy.getStartButtonPressed() && !Robot.m_robotContainer.opJoy.getXButton());
   
     }
     }

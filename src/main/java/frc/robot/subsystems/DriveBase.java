@@ -123,7 +123,7 @@ public class DriveBase extends SubsystemBase {
     // _right3.config_kD(Constants.kDrivePIDIdx,Constants.kGains_Vel.kD,Constants.kDriveTimeoutMs);
     
     //inverts the left motors
-    _left1.setInverted(true);    
+   _left1.setInverted(true);    
     _left2.setInverted(true);
     _left3.setInverted(true);       
     _right1.setInverted(false);
@@ -154,40 +154,40 @@ public class DriveBase extends SubsystemBase {
     
     m_odometry = new DifferentialDriveOdometry(getHeading());
 
-    _left1.setStatusFramePeriod(1, 20);
-    _right1.setStatusFramePeriod(1, 20);
-    _left2.setStatusFramePeriod(1, 20);
-    _right2.setStatusFramePeriod(1, 20);
-    _left3.setStatusFramePeriod(1, 20);
-    _right3.setStatusFramePeriod(1, 20);
+    _left1.setStatusFramePeriod(1, 10);
+    _right1.setStatusFramePeriod(1, 10);
+    _left2.setStatusFramePeriod(1, 10);
+    _right2.setStatusFramePeriod(1, 10);
+    _left3.setStatusFramePeriod(1, 10);
+    _right3.setStatusFramePeriod(1, 10);
 
-    _left1.setStatusFramePeriod(3, 13100);
-    _right1.setStatusFramePeriod(3, 13200);
-    _left2.setStatusFramePeriod(3, 13300);
-    _right2.setStatusFramePeriod(3, 13400);
-    _left3.setStatusFramePeriod(3, 13500);
-    _right3.setStatusFramePeriod(3, 13600);
+    _left1.setStatusFramePeriod(3, 13100*100);
+    _right1.setStatusFramePeriod(3, 13200*100);
+    _left2.setStatusFramePeriod(3, 13300*100);
+    _right2.setStatusFramePeriod(3, 13400*100);
+    _left3.setStatusFramePeriod(3, 13500*100);
+    _right3.setStatusFramePeriod(3, 13600*100);
 
-    _left1.setStatusFramePeriod(4, 17100);
-    _right1.setStatusFramePeriod(4, 17200);
-    _left2.setStatusFramePeriod(4, 17300);
-    _right2.setStatusFramePeriod(4, 17400);
-    _left3.setStatusFramePeriod(4, 17500);
-    _right3.setStatusFramePeriod(4, 17600);
+    _left1.setStatusFramePeriod(4, 17100*100);
+    _right1.setStatusFramePeriod(4, 17200*100);
+    _left2.setStatusFramePeriod(4, 17300*100);
+    _right2.setStatusFramePeriod(4, 17400*100);
+    _left3.setStatusFramePeriod(4, 17500*100);
+    _right3.setStatusFramePeriod(4, 17600*100);
 
-    _left1.setStatusFramePeriod(8, 19100);
-    _right1.setStatusFramePeriod(8, 19200);
-    _left2.setStatusFramePeriod(8, 19300);
-    _right2.setStatusFramePeriod(8, 19400);
-    _left3.setStatusFramePeriod(8, 19500);
-    _right3.setStatusFramePeriod(8, 19600);
+    _left1.setStatusFramePeriod(8, 19100*100);
+    _right1.setStatusFramePeriod(8, 19200*100);
+    _left2.setStatusFramePeriod(8, 19300*100);
+    _right2.setStatusFramePeriod(8, 19400*100);
+    _left3.setStatusFramePeriod(8, 19500*100);
+    _right3.setStatusFramePeriod(8, 19600*100);
 
-    _left1.setStatusFramePeriod(14, 23100);
-    _right1.setStatusFramePeriod(14, 23200);
-    _left2.setStatusFramePeriod(14, 23300);
-    _right2.setStatusFramePeriod(14, 23400);
-    _left3.setStatusFramePeriod(14, 23500);
-    _right3.setStatusFramePeriod(14, 23600);
+    _left1.setStatusFramePeriod(14, 23100*100);
+    _right1.setStatusFramePeriod(14, 23200*100);
+    _left2.setStatusFramePeriod(14, 23300*100);
+    _right2.setStatusFramePeriod(14, 23400*100);
+    _left3.setStatusFramePeriod(14, 23500*100);
+    _right3.setStatusFramePeriod(14, 23600*100);
 
 
 
@@ -199,8 +199,8 @@ public class DriveBase extends SubsystemBase {
     // may have to multiply velocity by 10 (change from 100ms to s?)
     leftEncPos = _left1.getSelectedSensorPosition() * Constants.kEncoderDistancePerPulse; 
     rightEncPos = _right1.getSelectedSensorPosition() * Constants.kEncoderDistancePerPulse;
-    leftEncVel = _left1.getSelectedSensorVelocity() *10* Constants.kEncoderDistancePerPulse;
-    rightEncVel = _right1.getSelectedSensorVelocity() *10* Constants.kEncoderDistancePerPulse;
+    leftEncVel = _left1.getSelectedSensorVelocity() * Constants.kEncoderDistancePerPulse;
+    rightEncVel = _right1.getSelectedSensorVelocity() * Constants.kEncoderDistancePerPulse;
     
     m_odometry.update(getHeading(), leftEncPos, rightEncPos);
   }

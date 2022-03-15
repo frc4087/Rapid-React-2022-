@@ -16,8 +16,7 @@ public class IntakeBase extends SubsystemBase {
   //public DoubleSolenoid intakeSol2 = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 1, 6);
 
   public IntakeBase() {
-    IntakeMotor.setSmartCurrentLimit(30);
-   
+    //IntakeMotor.setSmartCurrentLimit(30);
   }
 
   public void setIntake(double velocity){

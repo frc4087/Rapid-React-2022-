@@ -45,7 +45,7 @@ public class TopFeederActivate extends CommandBase {
     if (isAuto){
       return false;
     } else {
-      return !Robot.m_robotContainer.opJoy.getStartButton();
+      return !Robot.m_robotContainer.opJoy.getStartButton() && !Robot.m_robotContainer.opJoy.getXButton();
     }
     
   }

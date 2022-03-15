@@ -8,11 +8,13 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 
 public class ChangeBallCountBy extends CommandBase {
-  private int deltaBallCount;
+  private int deltaBallCount,
+              initBallCount;
 
   /** Creates a new ChangeBallCountBy. */
   public ChangeBallCountBy(int dBallCount) {
     deltaBallCount = dBallCount;
+    initBallCount = RobotContainer.ballCount;
     // Use addRequirements() here to declare subsystem dependencies.
   }
 
@@ -33,6 +35,6 @@ public class ChangeBallCountBy extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return RobotContainer.ballCount != initBallCount;
   }
 }
