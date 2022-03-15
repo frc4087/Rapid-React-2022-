@@ -7,9 +7,6 @@ package frc.robot;
 import java.io.IOException;
 import java.nio.file.Path;
 
-import com.revrobotics.CANSparkMax.SoftLimitDirection;
-
-import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -39,10 +36,9 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.commands.AutoLaunch;
 import frc.robot.commands.BeamBreakTriggered;
 import frc.robot.commands.BottomFeederActivate;
-import frc.robot.commands.BottomFeederReverse;
-import frc.robot.commands.ChangeBallCountBy;
+//import frc.robot.commands.BottomFeederReverse;
 import frc.robot.commands.IntakeActivate;
-import frc.robot.commands.IntakeReverse;
+//import frc.robot.commands.IntakeReverse;
 import frc.robot.commands.Launch1to2Ball;
 import frc.robot.commands.SetBlinkin;
 import frc.robot.commands.TopFeederActivate;
@@ -173,7 +169,7 @@ public class RobotContainer {
 
   public void roboPeriodic(){
       
-    if (m_LauncherBase.rLaunchMotor.get()!=0||opJoy.getStartButton()){
+    if (m_LauncherBase.rLaunchMotor.get()!=0||opJoy.getStartButton()||opJoy.getXButton()){
       ballCount = 0;
       m_IntakeBase.intakeSol1.set(Value.kReverse);
     } else {
@@ -187,11 +183,10 @@ public class RobotContainer {
         m_BFA.stop();
       } else {
         m_BFA.execute();
-     }
-
-     m_TurretBase.setPos(setpoint);
-
+     }     
     }
+    m_TurretBase.setPos(setpoint);
+
   }
 
   //AUTO INIT --------------------------------------------------------------------------------------------------
@@ -303,11 +298,11 @@ public class RobotContainer {
     
       if(opJoy.getLeftBumper()){
         //blinkPattern = Constants.strobeGold;
-        setpoint = -90;
-        // m_HangerBase.hangerSol.set(Value.kReverse);
+        setpoint = 90;
+        m_HangerBase.hangerSol.set(Value.kReverse);
         m_HangerBase.hangerMotors.set(0.9);
       } else if(opJoy.getRightBumper()){
-        setpoint = -90;
+        setpoint = 90;
         //blinkPattern = Constants.green;
         m_HangerBase.hangerMotors.set(-0.9);
       } else{
@@ -330,20 +325,19 @@ public class RobotContainer {
       // } if( RobotController.getBatteryVoltage() < 9){
       //   blinkPattern = Constants.red;
       // }
-      if(prevBall != currentBall && currentBall || opJoy.getRightBumperPressed() ){
-        blinkPattern = Constants.green;
-        //setDankLEDs(blinkPattern, 1.0);
-      } else if(opJoy.getLeftBumperPressed()){
+      if(RobotController.getBatteryVoltage() < 7){
+        blinkPattern = Constants.red;
+      } else if(opJoy.getLeftBumper()){
         blinkPattern = Constants.strobeGold;
        // setDankLEDs(blinkPattern, 1.0);
-      } else if(RobotController.getBatteryVoltage() < 7){
-        blinkPattern = Constants.red;
-      } else{
+      } else if(prevBall != currentBall && currentBall || opJoy.getRightBumper() ){
+        blinkPattern = Constants.green;
+      } else {
         blinkPattern = Constants.teleOpIdle;
         //m_BlinkinBase.set(blinkPattern);
       }
       m_BlinkinBase.set(blinkPattern);
-//      new SetBlinkin(Constants.violet);
+        //new SetBlinkin(Constants.violet);
     }
 
   //COMMANDS METHODS --------------------------------------------------------------------------------------------
@@ -361,7 +355,7 @@ public class RobotContainer {
                  .andThen(new BottomFeederActivate(false)));
       }
         return new Launch1to2Ball(isShootingLow)
-                  .alongWith(new WaitCommand(0.9)
+                  .alongWith(new WaitCommand(1.2)
                   .andThen(new TopFeederActivate(false)))
                   .alongWith(new WaitCommand(0.9)
                   .andThen(new BottomFeederActivate(false)));
