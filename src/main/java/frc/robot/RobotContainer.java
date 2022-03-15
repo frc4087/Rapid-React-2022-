@@ -9,6 +9,7 @@ import java.nio.file.Path;
 
 import com.revrobotics.CANSparkMax.SoftLimitDirection;
 
+import edu.wpi.first.hal.simulation.RoboRioDataJNI;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
@@ -23,6 +24,7 @@ import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -74,8 +76,8 @@ public class RobotContainer {
   //COMMANDS-----------------------------------------------------------------------------------------------------
   public final BottomFeederActivate m_BFA = new BottomFeederActivate(false);
   public final TopFeederActivate m_TFA = new TopFeederActivate(false);
-  public final Launch1to2Ball m_Launch12 = new Launch1to2Ball();
-  //public final Command m_SetBlink = new SetBlinkin(Constants.teleOpIdle);
+  public final Launch1to2Ball m_Launch12 = new Launch1to2Ball(true);
+  public final Command m_SetBlink = new SetBlinkin(Constants.strobeGold);
   
   //VARIABLES---------------------------------------------------------------------------------------------------- 
   public boolean  BButtonToggle = false,
@@ -101,6 +103,7 @@ public class RobotContainer {
   public final JoystickButton aButton = new JoystickButton(opJoy, Constants.kA),
                               bButton = new JoystickButton(opJoy, Constants.kB),
                               yButton = new JoystickButton(opJoy, Constants.kY),
+                              xButton = new JoystickButton(opJoy, Constants.kX),
                               startButton = new JoystickButton(opJoy, Constants.kStart);
   
   public POVButton  right = new POVButton(opJoy, 90),
@@ -132,50 +135,61 @@ public class RobotContainer {
 
   //------------------------------------------------------------------------------------------------------------
   
+
+
+
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
-
   }
 
-  private void configureButtonBindings() {
-  }
+  private void configureButtonBindings() {}
 
   //ROBOT INIT -------------------------------------------------------------------------------------------------
 
   public void roboInit(){
-      //autonomous paths 
+    ballCount = 0;
+    setpoint = 0;
+    
+    //autonomous paths 
     autoChooser.addOption("Taxi", "Taxi");
     autoChooser.addOption("Taxi 1 Ball", "Taxi 1 Ball");
     autoChooser.addOption("Taxi 2 Ball", "Taxi 2 Ball");
+    autoChooser.addOption("Taxi 2 Ball Outbound", "Taxi 2 Ball Outbound");
     autoChooser.addOption("Taxi 3 Ball", "Taxi 3 Ball");
     autoChooser.addOption("Taxi 4 Ball", "Taxi 4 Ball");
 
+    m_DriveBase.resetEncoders();
     SmartDashboard.putData("Auto Routine", autoChooser);
 
-    startButton.whenHeld(launchCommand());
-    aButton.whenHeld(ejectBottom());
+    startButton.whenHeld(launchCommand(true));
+    xButton.whenHeld(launchCommand(false));
+    //aButton.whenHeld(ejectBottom());
     //bButton.whenHeld(ejectTop());
     m_HangerBase.hangerSol.set(Value.kForward);
   }
 
   public void roboPeriodic(){
-      //LEDS
-      setDankLEDs(blinkPattern, 0.002);
+      
     if (m_LauncherBase.rLaunchMotor.get()!=0||opJoy.getStartButton()){
       ballCount = 0;
       m_IntakeBase.intakeSol1.set(Value.kReverse);
     } else {
 
-      if (ballCount >= 2){
-        setDankLEDs(Constants.violet, 2);
+      if (ballCount >= 2 && !opJoy.getAButton()){
         m_BFA.stop();
+      } else if (opJoy.getAButton()){
+        m_BFA.reverse();
+        ballCount--;
       } else if (m_IntakeBase.intakeSol1.get()==Value.kForward){
         m_BFA.stop();
       } else {
         m_BFA.execute();
      }
+
+     m_TurretBase.setPos(setpoint);
 
     }
   }
@@ -185,12 +199,18 @@ public class RobotContainer {
   public void autoInit(){
     //m_IntakeBase.intakeSol1.set(Value.kForward);
     //m_BlinkinBase.set(Constants.autoIdle);
+    // setpoint = -10;
+    m_DriveBase.resetEncoders();
+    m_DriveBase.m_gyro.reset();
     blinkPattern = Constants.autoIdle;
-    setDankLEDs(blinkPattern, 300).schedule(); //CHANGE SECONDS
+    m_BlinkinBase.set(blinkPattern); //CHANGE SECONDS
+    m_IntakeBase.intakeSol1.set(Value.kReverse);
     if (autoChooser.getSelected() != null){
       m_autonomousCommand = getAutonomousCommand(autoChooser.getSelected());
       m_autonomousCommand.schedule();
     }
+
+   
 
   }
 
@@ -202,15 +222,15 @@ public class RobotContainer {
   //TELEOP PERIODIC --------------------------------------------------------------------------------------------
 
   public void telePeroidic(){
+
     //m_limeLightBase.periodic(); //updates limelight vars
-    blinkPattern = Constants.violet; //teleOpIdle
     prevBall = currentBall;
     currentBall = m_debouncer.calculate(!beamBreak.get());
   
       //updates the ballcount
     if(prevBall != currentBall && currentBall){
         ballCount++;
-        blinkPattern = Constants.green;
+        //blinkPattern = Constants.green;
     }
 
     SmartDashboard.putBoolean("Hall Effect", m_TurretBase.getHallEffect());
@@ -279,15 +299,16 @@ public class RobotContainer {
         }
 
       setpoint -= getOpJoy(Constants.XR)*10;  
-      m_TurretBase.setPos(setpoint);
+      //m_TurretBase.setPos(setpoint);
     
       if(opJoy.getLeftBumper()){
-        blinkPattern = Constants.strobeGold;
+        //blinkPattern = Constants.strobeGold;
         setpoint = -90;
+        // m_HangerBase.hangerSol.set(Value.kReverse);
         m_HangerBase.hangerMotors.set(0.9);
       } else if(opJoy.getRightBumper()){
         setpoint = -90;
-        blinkPattern = Constants.green;
+        //blinkPattern = Constants.green;
         m_HangerBase.hangerMotors.set(-0.9);
       } else{
         m_HangerBase.hangerMotors.set(0);
@@ -302,21 +323,48 @@ public class RobotContainer {
       // } else if(m_HangerBase.leftHangerMotor.getEncoder().getPosition() < m_HangerBase.leftHangerMotor.getSoftLimit(SoftLimitDirection.kReverse)+2){
       //   //blinkPattern = Constants.green;
       // }
+
+        //BATTERY TO LED
+      // if(RobotController.getBatteryVoltage() < 11.0){
+      //   blinkPattern = Constants.strobeGold;
+      // } if( RobotController.getBatteryVoltage() < 9){
+      //   blinkPattern = Constants.red;
+      // }
+      if(prevBall != currentBall && currentBall || opJoy.getRightBumperPressed() ){
+        blinkPattern = Constants.green;
+        //setDankLEDs(blinkPattern, 1.0);
+      } else if(opJoy.getLeftBumperPressed()){
+        blinkPattern = Constants.strobeGold;
+       // setDankLEDs(blinkPattern, 1.0);
+      } else if(RobotController.getBatteryVoltage() < 7){
+        blinkPattern = Constants.red;
+      } else{
+        blinkPattern = Constants.teleOpIdle;
+        //m_BlinkinBase.set(blinkPattern);
+      }
       m_BlinkinBase.set(blinkPattern);
+//      new SetBlinkin(Constants.violet);
     }
 
   //COMMANDS METHODS --------------------------------------------------------------------------------------------
 
-    public Command launchCommand(){
+    public Command launchCommand(boolean isShootingLow){
       // SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
       // SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
       // return new ParallelCommandGroup(m_Launch12, topFeeder, bottomFeeder);
       //m_IntakeBase.intakeSol1.set(Value.kReverse);
-      return new Launch1to2Ball()
+      if(isShootingLow){
+        return new Launch1to2Ball(isShootingLow)
                  .alongWith(new WaitCommand(0.4)
                  .andThen(new TopFeederActivate(false)))
                  .alongWith(new WaitCommand(0.3)
                  .andThen(new BottomFeederActivate(false)));
+      }
+        return new Launch1to2Ball(isShootingLow)
+                  .alongWith(new WaitCommand(0.9)
+                  .andThen(new TopFeederActivate(false)))
+                  .alongWith(new WaitCommand(0.9)
+                  .andThen(new BottomFeederActivate(false)));
     }
 
     public Command timedLaunchCommand(double lSeconds, double fSeconds, double bSeconds){
@@ -338,14 +386,17 @@ public class RobotContainer {
     //   //the ball count should have been set to 0 so we add one after since we on
     // }
 
-    public Command ejectBottom(){
-      return new BottomFeederReverse()
-                 .alongWith(new IntakeReverse())
-                 .alongWith(new ParallelRaceGroup(new ChangeBallCountBy(-1), new WaitCommand(0.02)));
-    }
+    // public Command ejectBottom(){
+    //   return m_BFA.execute();
 
-    public Command setDankLEDs(double pattern, double d){
-      return new ParallelRaceGroup(new SetBlinkin(pattern), new WaitCommand(d));
+    //   // return new BottomFeederReverse()
+    //   //            .alongWith(new IntakeReverse())
+    //   //           // .alongWith(new ChangeBallCountBy(-1));
+    //   //            .alongWith(new ParallelRaceGroup(new ChangeBallCountBy(-1), new WaitCommand(0.02)));
+    // }
+
+    public Command setDankLEDs(double pattern, double time){
+      return new ParallelRaceGroup(new SetBlinkin(pattern), new WaitCommand(time));
     }
 
   
@@ -370,6 +421,20 @@ public class RobotContainer {
             .andThen(
               pathFollow("output/Taxi.wpilib.json", false));
     case "Taxi 2 Ball":
+      setpoint = -10;
+      return new IntakeActivate()
+            .alongWith(
+              new ParallelRaceGroup(
+                new BottomFeederActivate(true), 
+                new BeamBreakTriggered(1)))
+            .alongWith(
+              pathFollow("output/Taxi.wpilib.json", false)
+              .andThen(
+                pathFollow("output/TaxiRev.wpilib.json", true)
+              .andThen(
+                timedLaunchCommand(4.5, 3.5, 3))));
+    case "Taxi 2 Ball Outbound":
+      setpoint = 45;
       return new IntakeActivate()
             .alongWith(
               new ParallelRaceGroup(
