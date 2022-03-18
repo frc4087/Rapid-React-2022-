@@ -75,7 +75,7 @@ public final class Constants {
     public final static int TURR = 6;
 
     //PID
-    public final static double  kTurretP = 0.1,
+    public final static double  kTurretP = 0.03,
                                 kTurretI = 0.0,
                                 kTurretD = 0.0,
                                 kTurretFF = 0.0,
@@ -155,7 +155,10 @@ public final class Constants {
                                 green = 0.77,
                                 blue = 0.87,
                                 red = 0.61,
-                                violet = 0.91;
+                                violet = 0.91,
+                                cargoReady = -0.31,
+                                cargoSemiReady = -0.21,
+                                yellow = 0.69;
             
     //AUTO -----------------------------------------------------------------------------------------------------------------------------------
     

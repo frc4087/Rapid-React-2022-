@@ -6,15 +6,17 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANSparkMax.SoftLimitDirection;
+//import com.revrobotics.CANSparkMax.SoftLimitDirection;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 
 public class HangerBase extends SubsystemBase {
   /** Creates a new HangerBase. */
@@ -23,6 +25,7 @@ public class HangerBase extends SubsystemBase {
   public final MotorControllerGroup hangerMotors = new MotorControllerGroup(leftHangerMotor, rightHangerMotor);
  
   public DoubleSolenoid hangerSol = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 2, 5); //check these ports
+  public DoubleSolenoid hangerBreakSol = new DoubleSolenoid(PneumaticsModuleType.CTREPCM, 3, 4);
 
   public final Encoder hangEncoder = new Encoder(Constants.HangEncPort1, Constants.HangEncPort2);
   
@@ -48,6 +51,11 @@ public class HangerBase extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if(!Robot.m_robotContainer.opJoy.getLeftBumper() && !Robot.m_robotContainer.opJoy.getRightBumper()){
+      hangerBreakSol.set(Value.kReverse); //CHECK THESE
+    }else{
+      hangerBreakSol.set(Value.kForward);
+    }
     // This method will be called once per scheduler run
   }
 }

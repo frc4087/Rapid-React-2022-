@@ -30,7 +30,9 @@ public class LimeLightBase extends SubsystemBase {
   public double y;
   public static double conversionFac = 3.5/2.7;
 
-  public LimeLightBase() {}
+  public LimeLightBase() {
+    m_limelightTable.getEntry("pipeline").setNumber(0);
+  }
   
   public double get(String var) {
     return NetworkTableInstance.getDefault().getTable("limelight").getEntry(var).getDouble(0.0);
@@ -53,7 +55,7 @@ public class LimeLightBase extends SubsystemBase {
     y = ty.getDouble(0.0);
     //double distance = (Constants.heightLower-Constants.heightOfLimelight)/Math.tan(Math.toRadians(Constants.angleOfCamera + Math.atan(y)));;
     double distance = conversionFac*(Constants.heightLower-Constants.heightOfLimelight)/Math.tan(Math.toRadians(y + Constants.angleOfCamera));
-    
+
     //post to smart dashboard periodically
     SmartDashboard.putNumber("LimelightX", x);
     SmartDashboard.putNumber("LimelightY", y);

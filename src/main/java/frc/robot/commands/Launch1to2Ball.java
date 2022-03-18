@@ -15,6 +15,9 @@ import frc.robot.Robot;
 
 public class Launch1to2Ball extends CommandBase {
   public boolean isShootingLow;
+  public double lowPO;
+  public double highPO;
+
   public Launch1to2Ball(boolean _isShootingLow) {
     isShootingLow = _isShootingLow;
     //this.auto = auto;
@@ -30,10 +33,12 @@ public class Launch1to2Ball extends CommandBase {
   public void execute() {
 
     //Robot.m_robotContainer.m_LauncherBase.setRPM(750);
-    if(isShootingLow == true){
-    Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
+    if(isShootingLow){
+      //Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
+      Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
     } else{
-      Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
+      //Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
+      Robot.m_robotContainer.m_LauncherBase.setPO(0.30);
     }
     //   //updates the ball position
     // prevBall = currentBall;

@@ -5,27 +5,25 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.LimeLightBase;
-import frc.robot.subsystems.TurretBase;
 
 public class Tracking extends CommandBase {
   /** Creates a new Tracking. */
   public LimeLightBase limelight = new LimeLightBase();
-  public static TurretBase turret = new TurretBase();
+  //public static TurretBase turret = new TurretBase();
   boolean tracking = false;
 
   public Tracking() {
+    
     // Use addRequirements() here to declare subsystem dependencies.
   }
-  public void setTracking(boolean tracking) {
+  public void setTracking(boolean _tracking) {
+    tracking = _tracking;
     // Robot.m_robotContainer.m_limeLightBase.m_limelightTable.getEntry("camMode").setNumber(tracking ? 0 : 1);
     // Robot.m_robotContainer.m_limeLightBase.m_limelightTable.getEntry("ledMode").setNumber(tracking ? 0 : 1);
   }
-  
-
-
-
   
   // Called when the command is initially scheduled.
   @Override
@@ -36,13 +34,13 @@ public class Tracking extends CommandBase {
   public void execute() {
       limelight.setTracking(tracking);
       if (tracking) {
-        RobotContainer.setpoint = -turret.turretMotor.getEncoder().getPosition()
+        RobotContainer.setpoint = -Robot.m_robotContainer.m_TurretBase.turretMotor.getEncoder().getPosition()
             + (limelight.get("tx"));
             // + (1.25 / 154) * Robot.m_robotContainer.launchCommand.launcher.lidar.getDistance());
-        turret.turretPID.setI(0.000025);
+            Robot.m_robotContainer.m_TurretBase.turretPID.setI(0.000025);
       }
-      turret.turretPID.setI(0.00000);
-      turret.setPos(RobotContainer.setpoint);
+      Robot.m_robotContainer.m_TurretBase.turretPID.setI(0.00000);
+      Robot.m_robotContainer.m_TurretBase.setPos(RobotContainer.setpoint);
     }
   
 

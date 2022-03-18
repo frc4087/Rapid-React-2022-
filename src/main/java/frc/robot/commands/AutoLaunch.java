@@ -15,12 +15,13 @@ import frc.robot.Robot;
 
 
 public class AutoLaunch extends CommandBase {
-
+    public boolean isShootingLow;
     //private final LauncherBase m_LauncherBase;
     //private int time;
     //private double seconds;
 
-    public AutoLaunch(/*LauncherBase launcherBase, double seconds*/) {
+    public AutoLaunch(boolean _isShootingLow) {
+        isShootingLow = _isShootingLow;
         //m_LauncherBase = launcherBase;
         //this.seconds = seconds;
         // Use addRequirements() here to declare subsystem dependencies.
@@ -39,7 +40,14 @@ public class AutoLaunch extends CommandBase {
     public void execute() {
         //time++;
         // Robot.m_robotContainer.m_LauncherBase.setRPM(1000);
-        Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
+        if(isShootingLow){
+            //Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
+            Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
+          } else{
+            //Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
+            Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
+          }
+        //Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
     }
 
     // Called once the command ends or is interrupted.
