@@ -21,6 +21,7 @@ import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+//import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -85,7 +86,7 @@ public class RobotContainer {
                         JOY_DEADZONE = 0.1;
   public static int ballCount = 0;
 
-  public boolean tracking;
+  //public boolean tracking;
 
   //OTHER--------------------------------------------------------------------------------------------------------
   public final SlewRateLimiter filter = new SlewRateLimiter(5);
@@ -147,7 +148,7 @@ public class RobotContainer {
   public void roboInit(){
     ballCount = 0;
     setpoint = 0;
-    tracking = false;
+   // tracking = false;
     
     //autonomous paths 
     autoChooser.addOption("Taxi", "Taxi");
@@ -234,13 +235,9 @@ public class RobotContainer {
       m_autonomousCommand = getAutonomousCommand(autoChooser.getSelected());
       m_autonomousCommand.schedule();
     }
-
-   
-
   }
 
   public void teleopInit(){
-
     m_IntakeBase.intakeSol1.set(Value.kReverse);
   }
 
@@ -256,11 +253,11 @@ public class RobotContainer {
     if(prevBall != currentBall && currentBall){
         ballCount++;
     }
-    if(opJoy.getXButton()){
-      tracking = false; //true
-    } else{
-      tracking = false;
-    }
+    // if(opJoy.getXButton()){
+    //   tracking = false; //true
+    // } else{
+    //   tracking = false;
+    // }
 
     SmartDashboard.putBoolean("Hall Effect", m_TurretBase.getHallEffect());
     SmartDashboard.putNumber("The new ballCount", ballCount);
@@ -287,7 +284,11 @@ public class RobotContainer {
         m_DriveBase.m_drive.arcadeDrive(filter.calculate(-getDriveJoy(Constants.YL)), getDriveJoyXR());
         SmartDashboard.putString("Drivetype", "arcade");
       }
-      
+
+      /*if(time ){
+        m_HangerBase.hangerBreakSol.set(kReverse);
+      }
+      */
 
     //INTAKE
       if(opJoy.getRightTriggerAxis() > 0.01){
@@ -349,37 +350,37 @@ public class RobotContainer {
 
       if(isShootingLow){
         return new Launch1to2Ball(isShootingLow)
-                 .alongWith(new WaitCommand(0.4)
-                 .andThen(new TopFeederActivate(false)))
                  .alongWith(new WaitCommand(0.3)
-                 .andThen(new BottomFeederActivate(false)));
+                    .andThen(new TopFeederActivate(false)))
+                 .alongWith(new WaitCommand(0.5)
+                    .andThen(new BottomFeederActivate(false)));
       }
       return new Launch1to2Ball(isShootingLow)
-                  .alongWith(new WaitCommand(1.2)
-                  .andThen(new TopFeederActivate(false)))
                   .alongWith(new WaitCommand(0.9)
+                  .andThen(new TopFeederActivate(false)))
+                  .alongWith(new WaitCommand(1.2)
                   .andThen(new BottomFeederActivate(false)));
     }
 
-    public Command timedLaunchCommand(boolean isShootingLow, double lSeconds, double fSeconds, double bSeconds){
+    public Command timedLaunchCommand(double lSeconds, double fSeconds, double bSeconds){
       // SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
       // SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
       // return new ParallelCommandGroup(m_Launch12, topFeeder, bottomFeeder);
-      if(isShootingLow){
-        return new ParallelRaceGroup(new AutoLaunch(isShootingLow), new WaitCommand(lSeconds))
+      // if(isShootingLow){
+        return new ParallelRaceGroup(new AutoLaunch(), new WaitCommand(lSeconds))
                  .alongWith(new WaitCommand(1)
                  .andThen(new ParallelRaceGroup(new TopFeederActivate(true), new WaitCommand(fSeconds))))
                  .alongWith(new WaitCommand(1.5)
                  .andThen(new ParallelRaceGroup(new BottomFeederActivate(true), new WaitCommand(bSeconds))));
     
-      } else {
-        return new ParallelRaceGroup(new AutoLaunch(isShootingLow), new WaitCommand(lSeconds))
-                .alongWith(new WaitCommand(2)
-                .andThen(new ParallelRaceGroup(new TopFeederActivate(true), new WaitCommand(fSeconds))))
-                .alongWith(new WaitCommand(1.5)
-                .andThen(new ParallelRaceGroup(new BottomFeederActivate(true), new WaitCommand(bSeconds))));
+      // } else {
+      //   return new ParallelRaceGroup(new AutoLaunch(isShootingLow), new WaitCommand(lSeconds))
+      //           .alongWith(new WaitCommand(2)
+      //           .andThen(new ParallelRaceGroup(new TopFeederActivate(true), new WaitCommand(fSeconds))))
+      //           .alongWith(new WaitCommand(1.5)
+      //           .andThen(new ParallelRaceGroup(new BottomFeederActivate(true), new WaitCommand(bSeconds))));
 
-      }
+      // }
       
      }
 
@@ -421,17 +422,17 @@ public class RobotContainer {
     switch(path){
 
     case "Taxi":
-      tracking = false;
+    //  tracking = false;
       return pathFollow("output/Taxi.wpilib.json", false);
 
     case "Taxi 1 Ball Low":
-      tracking = false;
-      return timedLaunchCommand(true, 3, 2, 1.5)
+      //tracking = false;
+      return timedLaunchCommand(3, 2, 1.5)
             .andThen(
               pathFollow("output/Taxi.wpilib.json", false));
 
     case "Taxi 2 Ball Low":
-    tracking = false;
+    // tracking = false;
       setpoint = 0; //-10;
       return new IntakeActivate()
             .alongWith(
@@ -443,10 +444,10 @@ public class RobotContainer {
               .andThen(
                 pathFollow("output/TaxiRev.wpilib.json", true)
               .andThen(
-                timedLaunchCommand(true, 4.5, 3.5, 3))));
+                timedLaunchCommand(4.5, 3.5, 3))));
 
     case "Taxi 2 Ball Outbound Low":
-      tracking = false;
+      // tracking = false;
       setpoint = 0; //-10;
       return new IntakeActivate()
             .alongWith(
@@ -458,12 +459,12 @@ public class RobotContainer {
               .andThen(
                 pathFollow("output/TaxiRev.wpilib.json", true)
               .andThen(
-                timedLaunchCommand(true, 4.5, 3.5, 3))));
+                timedLaunchCommand(4.5, 3.5, 3))));
 
     case "Taxi 3 Ball Low":
-      tracking = false;
+      //tracking = false;
       return new IntakeActivate()
-            .alongWith(timedLaunchCommand(true, 3, 2, 1.5)
+            .alongWith(timedLaunchCommand(3, 2, 1.5)
             .andThen(
               pathFollow("output/Taxi3.wpilib.json", false).alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
             .andThen(
@@ -471,10 +472,10 @@ public class RobotContainer {
             .andThen(
               pathFollow("output/Taxi3Rev.wpilib.json", true))
             .andThen(
-              timedLaunchCommand(true, 4.5, 3.5, 3)));
+              timedLaunchCommand(4.5, 3.5, 3)));
 
     case "Taxi 4 Ball Low":
-      tracking = false;
+      //tracking = false;
       return //Taxi 2 Ball
             new IntakeActivate()
               .alongWith(
@@ -486,7 +487,7 @@ public class RobotContainer {
                 .andThen(
                   pathFollow("output/TaxiRev.wpilib.json", true)
                 .andThen(
-                  timedLaunchCommand(true, 4.5, 3.5, 3))))
+                  timedLaunchCommand(4.5, 3.5, 3))))
             //Taxi 2 Ball with Long Path
               .andThen(
                 pathFollow("output/Taxi3.wpilib.json", true).alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
@@ -495,17 +496,17 @@ public class RobotContainer {
               .andThen(
                 pathFollow("output/Taxi3Rev.wpilib.json", true))
               .andThen(
-                timedLaunchCommand(true, 4.5, 3.5, 3)));
+                timedLaunchCommand(4.5, 3.5, 3)));
 
     //HIGH AUTOS
     case "Taxi 1 Ball High":
-      tracking = false;
-      return timedLaunchCommand(false, 3, 2, 1.5)
+     // tracking = false;
+      return timedLaunchCommand(3, 2, 1.5)
             .andThen(
             pathFollow("output/Taxi.wpilib.json", false));
 
     case "Taxi 2 Ball High":
-      tracking = false;
+      //tracking = false;
       setpoint = -10;
       return new IntakeActivate()
             .alongWith(
@@ -517,10 +518,10 @@ public class RobotContainer {
               .andThen(
                 pathFollow("output/TaxiRevHigh.wpilib.json", true)
               .andThen(
-                timedLaunchCommand(false, 4.5, 3.5, 3))));
+                timedLaunchCommand(4.5, 3.5, 3))));
 
     case "Taxi 2 Ball Outbound High":
-      tracking = false;
+      //tracking = false;
       setpoint = 0; //-10;
       return new IntakeActivate()
             .alongWith(
@@ -532,12 +533,12 @@ public class RobotContainer {
               .andThen(
                 pathFollow("output/TaxiRevHigh.wpilib.json", true)
               .andThen(
-                timedLaunchCommand(false, 4.5, 3.5, 3))));
+                timedLaunchCommand(4.5, 3.5, 3))));
 
     case "Taxi 3 Ball High":
-      tracking = false;
+      //tracking = false;
       return new IntakeActivate()
-            .alongWith(timedLaunchCommand(false, 3, 2, 1.5)
+            .alongWith(timedLaunchCommand(3, 2, 1.5)
             .andThen(
               pathFollow("output/Taxi3.wpilib.json", false).alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
             .andThen(
@@ -545,10 +546,10 @@ public class RobotContainer {
             .andThen(
               pathFollow("output/Taxi3Rev.wpilib.json", true))
             .andThen(
-              timedLaunchCommand(false, 4.5, 3.5, 3)));
+              timedLaunchCommand(4.5, 3.5, 3)));
 
     case "Taxi 4 Ball High":
-      tracking = false;
+      //tracking = false;
       return //Taxi 2 Ball
             new IntakeActivate()
               .alongWith(
@@ -560,7 +561,7 @@ public class RobotContainer {
                 .andThen(
                   pathFollow("output/TaxiRev.wpilib.json", true)
                 .andThen(
-                  timedLaunchCommand(false, 4.5, 3.5, 3))))
+                  timedLaunchCommand(4.5, 3.5, 3))))
             //Taxi 2 Ball with Long Path
               .andThen(
                 pathFollow("output/Taxi3.wpilib.json", true).alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
@@ -569,7 +570,7 @@ public class RobotContainer {
               .andThen(
                 pathFollow("output/Taxi3Rev.wpilib.json", true))
               .andThen(
-                timedLaunchCommand(false, 4.5, 3.5, 3)));
+                timedLaunchCommand(4.5, 3.5, 3)));
     }
     return null;
   }

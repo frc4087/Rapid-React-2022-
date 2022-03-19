@@ -20,8 +20,8 @@ public class AutoLaunch extends CommandBase {
     //private int time;
     //private double seconds;
 
-    public AutoLaunch(boolean _isShootingLow) {
-        isShootingLow = _isShootingLow;
+    public AutoLaunch(/*boolean _isShootingLow*/) {
+        //isShootingLow = _isShootingLow;
         //m_LauncherBase = launcherBase;
         //this.seconds = seconds;
         // Use addRequirements() here to declare subsystem dependencies.
@@ -40,13 +40,13 @@ public class AutoLaunch extends CommandBase {
     public void execute() {
         //time++;
         // Robot.m_robotContainer.m_LauncherBase.setRPM(1000);
-        if(isShootingLow){
+       // if(isShootingLow){
             //Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
-            Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
-          } else{
-            //Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
-            Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
-          }
+        Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
+        //   } else{
+        //     //Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
+        //     Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
+        //   }
         //Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
     }
 

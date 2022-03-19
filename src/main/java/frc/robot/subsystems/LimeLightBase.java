@@ -13,12 +13,12 @@
 
 package frc.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+//import frc.robot.Constants;
 
 public class LimeLightBase extends SubsystemBase {
   /** Creates a new ExampleSubsystem. */
@@ -32,6 +32,8 @@ public class LimeLightBase extends SubsystemBase {
 
   public LimeLightBase() {
     m_limelightTable.getEntry("pipeline").setNumber(0);
+    m_limelightTable.getEntry("camMode").setNumber(1);
+    m_limelightTable.getEntry("ledMode").setNumber(1);
   }
   
   public double get(String var) {
@@ -54,12 +56,12 @@ public class LimeLightBase extends SubsystemBase {
     x = tx.getDouble(0.0);
     y = ty.getDouble(0.0);
     //double distance = (Constants.heightLower-Constants.heightOfLimelight)/Math.tan(Math.toRadians(Constants.angleOfCamera + Math.atan(y)));;
-    double distance = conversionFac*(Constants.heightLower-Constants.heightOfLimelight)/Math.tan(Math.toRadians(y + Constants.angleOfCamera));
+    //double distance = conversionFac*(Constants.heightLower-Constants.heightOfLimelight)/Math.tan(Math.toRadians(y + Constants.angleOfCamera));
 
     //post to smart dashboard periodically
-    SmartDashboard.putNumber("LimelightX", x);
-    SmartDashboard.putNumber("LimelightY", y);
-    SmartDashboard.putNumber("Distance Inches", distance*12);
+    // SmartDashboard.putNumber("LimelightX", x);
+    // SmartDashboard.putNumber("LimelightY", y);
+    // SmartDashboard.putNumber("Distance Inches", distance*12);
   }
 
   
