@@ -6,14 +6,9 @@ package frc.robot;
 
 import java.io.IOException;
 import java.nio.file.Path;
-
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.RamseteController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
-
-//import java.util.concurrent.TimeUnit;
-
-//import edu.wpi.first.hal.ConstantsJNI;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -21,11 +16,10 @@ import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-//import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-//import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
@@ -33,23 +27,8 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
-import frc.robot.commands.AutoLaunch;
-import frc.robot.commands.BeamBreakTriggered;
-import frc.robot.commands.BottomFeederActivate;
-//import frc.robot.commands.BottomFeederReverse;
-import frc.robot.commands.IntakeActivate;
-//import frc.robot.commands.IntakeReverse;
-import frc.robot.commands.Launch1to2Ball;
-import frc.robot.commands.SetBlinkin;
-import frc.robot.commands.TopFeederActivate;
-import frc.robot.subsystems.BlinkinBase;
-import frc.robot.subsystems.DriveBase;
-import frc.robot.subsystems.FeederBase;
-import frc.robot.subsystems.HangerBase;
-import frc.robot.subsystems.IntakeBase;
-import frc.robot.subsystems.LauncherBase;
-import frc.robot.subsystems.LimeLightBase;
-import frc.robot.subsystems.TurretBase;
+import frc.robot.commands.*;
+import frc.robot.subsystems.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -75,23 +54,20 @@ public class RobotContainer {
   public final Launch1to2Ball m_Launch12 = new Launch1to2Ball(true);
   public final Command m_SetBlink = new SetBlinkin(Constants.strobeGold);
 
-  
   //VARIABLES---------------------------------------------------------------------------------------------------- 
-  public boolean  BButtonToggle = false,
-                  YButtonToggle = false,
-                  prevBall,
-                  currentBall;
+  public boolean        BButtonToggle = false,
+                        YButtonToggle = false,
+                        prevBall,
+                        currentBall;
   public static double  setpoint,
                         blinkPattern = Constants.autoIdle,
                         JOY_DEADZONE = 0.1;
-  public static int ballCount = 0;
-
-  //public boolean tracking;
+  public static int     ballCount = 0;
 
   //OTHER--------------------------------------------------------------------------------------------------------
-  public final SlewRateLimiter filter = new SlewRateLimiter(5);
+  public SlewRateLimiter filter = new SlewRateLimiter(5);
   public DigitalInput beamBreak = new DigitalInput(0);
-  Debouncer m_debouncer = new Debouncer(0.06, Debouncer.DebounceType.kBoth);
+  public Debouncer m_debouncer = new Debouncer(0.06, Debouncer.DebounceType.kBoth);
   public SendableChooser<String> autoChooser = new SendableChooser<String>();
   public Command m_autonomousCommand;
   public Trajectory trajectory;
@@ -111,7 +87,13 @@ public class RobotContainer {
                     downLeft = new POVButton(opJoy, 225),
                     left = new POVButton(opJoy, 270);
 
-    //returns the joystick values from -1 to 1, implements a deadzone around zero to prevent drift
+    /**
+     * Converts the speed readable by the talons to the RPM
+     *
+     * @param axis The axis of the joystick (i.e. YL is y-axis on left joystick)
+     * 
+     * @return the joystick values from -1 to 1, implements a deadzone around zero to prevent drift
+     */
   public double getDriveJoy(int axis) {
     double raw = driveJoy.getRawAxis(axis);
     return Math.abs(raw) < JOY_DEADZONE ? 0.0 : raw;
@@ -148,7 +130,7 @@ public class RobotContainer {
   public void roboInit(){
     ballCount = 0;
     setpoint = 0;
-   // tracking = false;
+    // tracking = false;
     
     //autonomous paths 
     autoChooser.addOption("Taxi", "Taxi");
@@ -168,9 +150,9 @@ public class RobotContainer {
     m_DriveBase.resetEncoders();
     SmartDashboard.putData("Auto Routine", autoChooser);
 
-    startButton.whenHeld(launchCommand(true));
+    startButton.whenHeld(launchCommand(true)); 
     xButton.whenHeld(launchCommand(false));
-    //aButton.whenHeld(ejectBottom());
+    // aButton.whenHeld(ejectBottom());
     //bButton.whenHeld(ejectTop());
     m_HangerBase.hangerSol.set(Value.kForward);
   }
@@ -192,8 +174,10 @@ public class RobotContainer {
         m_BFA.stop();
       } else {
         m_BFA.execute();
-     }     
-    }
+     }  
+     }
+    // m_BFA.execute();
+    // m_TFA.execute();
 
     //TURRET     
     m_TurretBase.resetEncoder();
@@ -209,11 +193,6 @@ public class RobotContainer {
       } else if (left.get()){
         setpoint = -90;
       } 
-      // else if (tracking){
-      //   setpoint = -m_TurretBase.turretMotor.getEncoder().getPosition()
-      //         - (m_LimeLightBase.get("tx"));
-      // }
-
     setpoint -= getOpJoy(Constants.XR)*10;  
 
     m_TurretBase.setPos(setpoint);
@@ -222,30 +201,32 @@ public class RobotContainer {
 
   //AUTO INIT --------------------------------------------------------------------------------------------------
 
-  public void autoInit(){
-    //m_IntakeBase.intakeSol1.set(Value.kForward);
-    //m_BlinkinBase.set(Constants.autoIdle);
-    // setpoint = -10;
-    m_DriveBase.resetEncoders();
-    m_DriveBase.m_gyro.reset();
-    blinkPattern = Constants.autoIdle;
-    m_BlinkinBase.set(blinkPattern); //CHANGE SECONDS
-    m_IntakeBase.intakeSol1.set(Value.kReverse);
-    if (autoChooser.getSelected() != null){
-      m_autonomousCommand = getAutonomousCommand(autoChooser.getSelected());
-      m_autonomousCommand.schedule();
+    public void autoInit(){
+      
+      m_DriveBase.resetEncoders();
+      m_DriveBase.m_gyro.reset();
+      blinkPattern = Constants.autoIdle;
+      m_BlinkinBase.set(blinkPattern); //CHANGE SECONDS
+      m_IntakeBase.intakeSol1.set(Value.kReverse);
+      if (autoChooser.getSelected() != null){
+        m_autonomousCommand = getAutonomousCommand(autoChooser.getSelected());
+        m_autonomousCommand.schedule();
+      }
     }
-  }
 
-  public void teleopInit(){
-    m_IntakeBase.intakeSol1.set(Value.kReverse);
-  }
+    public void teleopInit(){
+      SmartDashboard.putNumber("front launch RPM", 0);
+      SmartDashboard.putNumber("back launch RPM", 0);
+      m_IntakeBase.intakeSol1.set(Value.kReverse);
+    }
 
   //TELEOP PERIODIC --------------------------------------------------------------------------------------------
 
   public void telePeroidic(){
+    SmartDashboard.putNumber("front launch velocity direct reading", m_LauncherBase.lLaunchMotor.getSelectedSensorVelocity());
+    SmartDashboard.putNumber("back launch RPM reading", m_LauncherBase.blaunchMotor.getEncoder().getVelocity()/16.0);
+    SmartDashboard.putNumber("front launch RPM reading", Constants.talonVelToRPM(m_LauncherBase.lLaunchMotor.getSelectedSensorVelocity()));
 
-    //m_limeLightBase.periodic(); //updates limelight vars
     prevBall = currentBall;
     currentBall = m_debouncer.calculate(!beamBreak.get());
   
@@ -253,13 +234,16 @@ public class RobotContainer {
     if(prevBall != currentBall && currentBall){
         ballCount++;
     }
-    // if(opJoy.getXButton()){
-    //   tracking = false; //true
-    // } else{
-    //   tracking = false;
-    // }
 
-    SmartDashboard.putBoolean("Hall Effect", m_TurretBase.getHallEffect());
+    // if(opJoy.getStartButton()){
+    //   m_LauncherBase.setFrontRPM(SmartDashboard.getNumber("front launch RPM", 0));
+    //   m_LauncherBase.setBackRPM(SmartDashboard.getNumber("back launch RPM", 0));
+    // } else{
+    //   m_LauncherBase.setFrontRPM(0);
+    //   m_LauncherBase.setBackRPM(0);
+    // } 
+    
+    //SmartDashboard.putBoolean("Hall Effect", m_TurretBase.getHallEffect());
     SmartDashboard.putNumber("The new ballCount", ballCount);
 
     //DRIVEBASE
@@ -285,10 +269,9 @@ public class RobotContainer {
         SmartDashboard.putString("Drivetype", "arcade");
       }
 
-      /*if(time ){
-        m_HangerBase.hangerBreakSol.set(kReverse);
+      if(getOpJoy(Constants.YL) != 0){
+        m_FeederBase.BottomFeederMotor.set(getOpJoy(Constants.YL));
       }
-      */
 
     //INTAKE
       if(opJoy.getRightTriggerAxis() > 0.01){
@@ -298,25 +281,14 @@ public class RobotContainer {
       } else {
         m_IntakeBase.IntakeMotor.set(0.0);
       }
-
-
-      // if(m_FeederBase.BottomFeederMotor.get()!=0){
-      //   m_IntakeBase.intakeSol1.set(Value.kReverse);
-      // }else{
-        
-      // }
       
       if(opJoy.getBButtonPressed()){
         m_IntakeBase.intakeSol1.toggle();
-        //m_IntakeBase.intakeSol2.toggle();
-      }
-      
+      }   
     
       if(opJoy.getLeftBumper()){
-        setpoint = 0; //90;
         m_HangerBase.hangerMotors.set(0.9);
       } else if(opJoy.getRightBumper()){
-        setpoint = 0; //90;
         m_HangerBase.hangerMotors.set(-0.9);
       } else{
         m_HangerBase.hangerMotors.set(0);
@@ -325,8 +297,10 @@ public class RobotContainer {
       if(opJoy.getYButtonPressed()){
         m_HangerBase.hangerSol.toggle(); 
       }
-       
-      if(/*RobotController.getBatteryVoltage() < 7 ||*/ ballCount == 0){
+      
+      if(RobotController.getBatteryVoltage() < 7){
+        blinkPattern = Constants.violet;
+      } else if(ballCount == 0){
         blinkPattern = Constants.red;
       } else if (ballCount == 1){
         blinkPattern = Constants.yellow;
@@ -335,7 +309,7 @@ public class RobotContainer {
       } else if(opJoy.getLeftBumper() || ballCount == 2 ){
         blinkPattern = Constants.green;
       } else {
-        blinkPattern = Constants.red;
+        blinkPattern = Constants.teleOpIdle;
       }
       m_BlinkinBase.set(blinkPattern);
     }
@@ -343,46 +317,39 @@ public class RobotContainer {
   //COMMANDS METHODS --------------------------------------------------------------------------------------------
 
     public Command launchCommand(boolean isShootingLow){
-      // SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
-      // SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
-      // return new ParallelCommandGroup(m_Launch12, topFeeder, bottomFeeder);
-      //m_IntakeBase.intakeSol1.set(Value.kReverse);
-
+      
       if(isShootingLow){
         return new Launch1to2Ball(isShootingLow)
                  .alongWith(new WaitCommand(0.3)
                     .andThen(new TopFeederActivate(false)))
-                 .alongWith(new WaitCommand(0.5)
+                 .alongWith(new WaitCommand(0.8)
                     .andThen(new BottomFeederActivate(false)));
       }
+      // return new Launch1to2Ball(isShootingLow)
+      //             .alongWith(new WaitCommand(0.9)
+      //             .andThen(new TopFeederActivate(false)))
+      //             .alongWith(new WaitCommand(2)
+      //             .andThen(new BottomFeederActivate(false)));
       return new Launch1to2Ball(isShootingLow)
-                  .alongWith(new WaitCommand(0.9)
-                  .andThen(new TopFeederActivate(false)))
-                  .alongWith(new WaitCommand(1.2)
-                  .andThen(new BottomFeederActivate(false)));
+                .alongWith(new WaitCommand(0.3)
+                  .andThen(new ParallelRaceGroup(new WaitCommand(0.75),new TopFeederActivate(false), new BottomFeederActivate(false))
+                  .andThen(new WaitCommand(0.5))
+                  .andThen(new ParallelRaceGroup(new WaitCommand(0.75),new TopFeederActivate(false), new BottomFeederActivate(false)))));
     }
 
-    public Command timedLaunchCommand(double lSeconds, double fSeconds, double bSeconds){
-      // SequentialCommandGroup topFeeder = new SequentialCommandGroup(new WaitCommand(0.1), new TopFeederActivate());
-      // SequentialCommandGroup bottomFeeder = new SequentialCommandGroup(new WaitCommand(0.3), new BottomFeederActivate());
-      // return new ParallelCommandGroup(m_Launch12, topFeeder, bottomFeeder);
-      // if(isShootingLow){
-        return new ParallelRaceGroup(new AutoLaunch(), new WaitCommand(lSeconds))
-                 .alongWith(new WaitCommand(1)
-                 .andThen(new ParallelRaceGroup(new TopFeederActivate(true), new WaitCommand(fSeconds))))
-                 .alongWith(new WaitCommand(1.5)
-                 .andThen(new ParallelRaceGroup(new BottomFeederActivate(true), new WaitCommand(bSeconds))));
-    
-      // } else {
-      //   return new ParallelRaceGroup(new AutoLaunch(isShootingLow), new WaitCommand(lSeconds))
-      //           .alongWith(new WaitCommand(2)
-      //           .andThen(new ParallelRaceGroup(new TopFeederActivate(true), new WaitCommand(fSeconds))))
-      //           .alongWith(new WaitCommand(1.5)
-      //           .andThen(new ParallelRaceGroup(new BottomFeederActivate(true), new WaitCommand(bSeconds))));
+    public Command timedLaunchCommand(boolean isShootingLow, double lSeconds, double runSeconds){
+      return new ParallelRaceGroup(new AutoLaunch(isShootingLow), new WaitCommand(lSeconds))
+                .alongWith(new WaitCommand(0.3)
+                  .andThen(new ParallelRaceGroup(new WaitCommand(runSeconds),new TopFeederActivate(false), new BottomFeederActivate(false))
+                  .andThen(new WaitCommand(0.5))
+                  .andThen(new ParallelRaceGroup(new WaitCommand(runSeconds),new TopFeederActivate(false), new BottomFeederActivate(false)))));
 
-      // }
-      
-     }
+      //   return new ParallelRaceGroup(new AutoLaunch(), new WaitCommand(lSeconds))
+    //              .alongWith(new WaitCommand(1)
+    //              .andThen(new ParallelRaceGroup(new TopFeederActivate(true), new WaitCommand(fSeconds))))
+    //              .alongWith(new WaitCommand(1.5)
+    //              .andThen(new ParallelRaceGroup(new BottomFeederActivate(true), new WaitCommand(bSeconds))));
+      }
 
     // public Command ejectTop(){
     //   return new Launch1to2Ball()
@@ -427,13 +394,12 @@ public class RobotContainer {
 
     case "Taxi 1 Ball Low":
       //tracking = false;
-      return timedLaunchCommand(3, 2, 1.5)
+      return timedLaunchCommand(true, 3, 0.75)
             .andThen(
               pathFollow("output/Taxi.wpilib.json", false));
 
     case "Taxi 2 Ball Low":
-    // tracking = false;
-      setpoint = 0; //-10;
+  
       return new IntakeActivate()
             .alongWith(
               new ParallelRaceGroup(
@@ -444,11 +410,11 @@ public class RobotContainer {
               .andThen(
                 pathFollow("output/TaxiRev.wpilib.json", true)
               .andThen(
-                timedLaunchCommand(4.5, 3.5, 3))));
+                timedLaunchCommand(true, 4.5, 0.75))));
 
+    // Can get rid of this case
     case "Taxi 2 Ball Outbound Low":
-      // tracking = false;
-      setpoint = 0; //-10;
+      
       return new IntakeActivate()
             .alongWith(
               new ParallelRaceGroup(
@@ -459,20 +425,21 @@ public class RobotContainer {
               .andThen(
                 pathFollow("output/TaxiRev.wpilib.json", true)
               .andThen(
-                timedLaunchCommand(4.5, 3.5, 3))));
+                timedLaunchCommand(true, 4.5, 0.75))));
 
     case "Taxi 3 Ball Low":
-      //tracking = false;
+      
       return new IntakeActivate()
-            .alongWith(timedLaunchCommand(3, 2, 1.5)
+            .alongWith(timedLaunchCommand(true, 3, 0.75)
             .andThen(
-              pathFollow("output/Taxi3.wpilib.json", false).alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
+              pathFollow("output/Taxi3.wpilib.json", false)
+                .alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
             .andThen(
               new WaitCommand(0.1))
             .andThen(
               pathFollow("output/Taxi3Rev.wpilib.json", true))
             .andThen(
-              timedLaunchCommand(4.5, 3.5, 3)));
+              timedLaunchCommand(true, 4.5, 0.75)));
 
     case "Taxi 4 Ball Low":
       //tracking = false;
@@ -487,27 +454,25 @@ public class RobotContainer {
                 .andThen(
                   pathFollow("output/TaxiRev.wpilib.json", true)
                 .andThen(
-                  timedLaunchCommand(4.5, 3.5, 3))))
+                  timedLaunchCommand(true, 4.5, 0.75))))
             //Taxi 2 Ball with Long Path
               .andThen(
-                pathFollow("output/Taxi3.wpilib.json", true).alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
+                pathFollow("output/Taxi3.wpilib.json", true)
+                  .alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
               .andThen(
                 new WaitCommand(0.1))
               .andThen(
                 pathFollow("output/Taxi3Rev.wpilib.json", true))
               .andThen(
-                timedLaunchCommand(4.5, 3.5, 3)));
+                timedLaunchCommand(true, 4.5, 0.75)));
 
     //HIGH AUTOS
     case "Taxi 1 Ball High":
-     // tracking = false;
-      return timedLaunchCommand(3, 2, 1.5)
+      return timedLaunchCommand(false, 3, 0.75)
             .andThen(
             pathFollow("output/Taxi.wpilib.json", false));
 
     case "Taxi 2 Ball High":
-      //tracking = false;
-      setpoint = -10;
       return new IntakeActivate()
             .alongWith(
               new ParallelRaceGroup(
@@ -516,13 +481,11 @@ public class RobotContainer {
             .alongWith(
               pathFollow("output/Taxi.wpilib.json", false)
               .andThen(
-                pathFollow("output/TaxiRevHigh.wpilib.json", true)
+                pathFollow("output/TaxiRev.wpilib.json", true)
               .andThen(
-                timedLaunchCommand(4.5, 3.5, 3))));
+                timedLaunchCommand(false, 4.5, 0.75))));
 
     case "Taxi 2 Ball Outbound High":
-      //tracking = false;
-      setpoint = 0; //-10;
       return new IntakeActivate()
             .alongWith(
               new ParallelRaceGroup(
@@ -531,14 +494,13 @@ public class RobotContainer {
             .alongWith(
               pathFollow("output/Taxi.wpilib.json", false)
               .andThen(
-                pathFollow("output/TaxiRevHigh.wpilib.json", true)
+                pathFollow("output/TaxiRev.wpilib.json", true)
               .andThen(
-                timedLaunchCommand(4.5, 3.5, 3))));
+                timedLaunchCommand(false, 4.5, 0.75))));
 
     case "Taxi 3 Ball High":
-      //tracking = false;
       return new IntakeActivate()
-            .alongWith(timedLaunchCommand(3, 2, 1.5)
+            .alongWith(timedLaunchCommand(false, 3, 0.75)
             .andThen(
               pathFollow("output/Taxi3.wpilib.json", false).alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
             .andThen(
@@ -546,10 +508,9 @@ public class RobotContainer {
             .andThen(
               pathFollow("output/Taxi3Rev.wpilib.json", true))
             .andThen(
-              timedLaunchCommand(4.5, 3.5, 3)));
+              timedLaunchCommand(false, 4.5, 0.75)));
 
     case "Taxi 4 Ball High":
-      //tracking = false;
       return //Taxi 2 Ball
             new IntakeActivate()
               .alongWith(
@@ -561,7 +522,7 @@ public class RobotContainer {
                 .andThen(
                   pathFollow("output/TaxiRev.wpilib.json", true)
                 .andThen(
-                  timedLaunchCommand(4.5, 3.5, 3))))
+                  timedLaunchCommand(false, 4.5, 0.75))))
             //Taxi 2 Ball with Long Path
               .andThen(
                 pathFollow("output/Taxi3.wpilib.json", true).alongWith(new ParallelRaceGroup(new BeamBreakTriggered(2), new BottomFeederActivate(true))))
@@ -570,17 +531,22 @@ public class RobotContainer {
               .andThen(
                 pathFollow("output/Taxi3Rev.wpilib.json", true))
               .andThen(
-                timedLaunchCommand(4.5, 3.5, 3)));
+                timedLaunchCommand(false, 4.5, 0.75)));
     }
+
     return null;
   }
 
+  /** 
+   * @TODO Auto-generated catch block
+  */
   public Command pathFollow(String trajectoryJSON, boolean multiPath){
     try {
       Path testTrajectory = Filesystem.getDeployDirectory().toPath().resolve(trajectoryJSON);
       trajectory = TrajectoryUtil.fromPathweaverJson(testTrajectory);
     } catch (final IOException ex) {
-      // TODO Auto-generated catch block
+
+
       DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
     }
     //m_drivebase.m_gyro.reset();
@@ -601,6 +567,7 @@ public class RobotContainer {
     // Run path following command, then stop at the end.
     // Robot.m_robotContainer.m_driveAuto.m_drive.feed();
     //m_drivebase.resetOdometry(trajectory.getInitialPose());
+    
     if (!multiPath){
       m_DriveBase.resetOdometry(trajectory.getInitialPose());
     } 

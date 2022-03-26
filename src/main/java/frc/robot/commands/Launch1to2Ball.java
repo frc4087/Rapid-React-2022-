@@ -35,10 +35,12 @@ public class Launch1to2Ball extends CommandBase {
     //Robot.m_robotContainer.m_LauncherBase.setRPM(750);
     if(isShootingLow){
       //Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
-      Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
+      Robot.m_robotContainer.m_LauncherBase.setFrontRPM(1750);
+      Robot.m_robotContainer.m_LauncherBase.setBackRPM(0);
     } else{
       //Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
-      Robot.m_robotContainer.m_LauncherBase.setPO(0.30);
+      Robot.m_robotContainer.m_LauncherBase.setFrontRPM(3500);
+      Robot.m_robotContainer.m_LauncherBase.setBackRPM(1000);
     }
     //   //updates the ball position
     // prevBall = currentBall;

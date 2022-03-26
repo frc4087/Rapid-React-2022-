@@ -20,7 +20,8 @@ public class AutoLaunch extends CommandBase {
     //private int time;
     //private double seconds;
 
-    public AutoLaunch(/*boolean _isShootingLow*/) {
+    public AutoLaunch(boolean _isShootingLow) {
+        isShootingLow = _isShootingLow;
         //isShootingLow = _isShootingLow;
         //m_LauncherBase = launcherBase;
         //this.seconds = seconds;
@@ -38,16 +39,15 @@ public class AutoLaunch extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        //time++;
-        // Robot.m_robotContainer.m_LauncherBase.setRPM(1000);
-       // if(isShootingLow){
+        if(isShootingLow){
             //Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
-        Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
-        //   } else{
-        //     //Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
-        //     Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
-        //   }
-        //Robot.m_robotContainer.m_LauncherBase.setPO(0.15);
+            Robot.m_robotContainer.m_LauncherBase.setFrontRPM(1750);
+            Robot.m_robotContainer.m_LauncherBase.setBackRPM(0);
+          } else{
+            //Robot.m_robotContainer.m_LauncherBase.setPO(0.3);
+            Robot.m_robotContainer.m_LauncherBase.setFrontRPM(3500);
+            Robot.m_robotContainer.m_LauncherBase.setBackRPM(1000);
+          }
     }
 
     // Called once the command ends or is interrupted.

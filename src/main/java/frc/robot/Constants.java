@@ -18,12 +18,13 @@ public final class Constants {
 
     //JOYSTICKS -------------------------------------------------------------------------------------------------------------------------------
     
-    public static final int XL = 0,
-                            YL = 1,
-                            XR = 4,
-                            YR = 5;
+    public static final int XL = 0, //x-axis left joystick
+                            YL = 1, //y-axis left joystick
+                            XR = 4, //x-acis right joystick
+                            YR = 5; //y-axis right joystick
 
-    public static final int kLeftBumper = 5,
+    public static final int //buttons
+                            kLeftBumper = 5,
                             kRightBumper = 6,
                             kLeftStick = 9,
                             kRightStick = 10,
@@ -36,75 +37,88 @@ public final class Constants {
 
     //DRIVEBASE -------------------------------------------------------------------------------------------------------------------------------
     
-    //Talons
-    public final static int L1=2, 
-                            L2=3, 
-                            L3=4, 
-                            R1=5, 
-                            R2=6, 
-                            R3=7;
+        //Talons
+        public final static int //labeled on talons
+                                L1=2, 
+                                L2=3, 
+                                L3=4, 
+                                R1=5, 
+                                R2=6, 
+                                R3=7;
 
-    //Drive speed limiters
-    public static final double SpeedDivider = 10.0,
-                               secondsForOpenRamp = 0.8,
-                               CurrentLimmit = 30;
+        //Drive speed limiters
+        public static final double SpeedDivider = 10.0,
+                                   secondsForOpenRamp = 0.8,
+                                   CurrentLimmit = 30;
 
-    public final static int kDriveTimeoutMs = 30,
-                            kDrivePIDIdx = 0;
+        public final static int kDriveTimeoutMs = 30,
+                                kDrivePIDIdx = 0;
     //INTAKE ----------------------------------------------------------------------------------------------------------------------------------
     
-    //Sparks
-    public static final int INTAKE = 7;
+        //Sparks
+        public static final int INTAKE = 7;
 
-    //Speeds
-    public static final double IMSpeed = 1.0;
+        //Speeds
+        public static final double IMSpeed = 1.0;
 
     //FEEDER ----------------------------------------------------------------------------------------------------------------------------------
 
-    //Sparks
-    public final static int BOTTOMFEED = 10,
-                            TOPFEED = 1;
-                            
-    //Motor Speeds
-    public static final double  BFMSpeed = 1.0,
-                                TFMSpeed = 0.8;
+        //Sparks
+        public final static int BOTTOMFEED = 10,
+                                TOPFEED = 1;
+                                
+        //Motor Speeds
+        public static final double  BFMSpeed = 1.0,
+                                    TFMSpeed = 0.8;
 
     //TURRET ----------------------------------------------------------------------------------------------------------------------------------
 
-    //Sparks
-    public final static int TURR = 6;
+        //Sparks
+        public final static int TURR = 6;
 
-    //PID
-    public final static double  kTurretP = 0.03,
-                                kTurretI = 0.0,
-                                kTurretD = 0.0,
-                                kTurretFF = 0.0,
-                                kTurretIZ = 0.0;
+        //PID
+        public final static double  kTurretP = 0.03,
+                                    kTurretI = 0.0,
+                                    kTurretD = 0.0,
+                                    kTurretFF = 0.0,
+                                    kTurretIZ = 0.0;
 
-    public final static double turretPosConFac = ((1/70.0)*360);
+        public final static double turretPosConFac = ((1/70.0)*360);
 
     //LAUNCHER --------------------------------------------------------------------------------------------------------------------------------
     
-    //Sparks
-    public final static int RLAUNCH = 0,
-                            LLAUNCH = 1;
-    
-    //Config
-    public final static int kLaunchTimeoutMs = 30,
-                            kLaunchPIDIdx = 0;
+        //Talons
+        public final static int RLAUNCH = 0, //right front flywheel
+                                LLAUNCH = 1; //left front flywheel
+        
+        //Spark
+        public final static int BLAUNCH = 14; //back flywheel
 
-    //PID
-    public final static double  kLauncherP = 0,// .0000035,
-                                kLauncherI = 0.000000002,
-                                kLauncherD = 0,
-                                kLauncherFF = .00017647,
-                                kLauncherIZ = 0.0;
+        //Config
+        public final static int kLaunchTimeoutMs = 30,
+                                kLaunchPIDIdx = 0;
+        public final static double backLaunchPosConFac = 1;
 
-    //Limelight
-    public static final double  heightOfLimelight = 21.5/12, //height limelight is mounted at in feet
-                                heightUpper = 10, //TO BE CHANGED from 10!!! //height vision target at upper port is mounted at in feet
-                                heightLower = 41.0/12.0, //TO BE CHANGED from 4!!! //height vision target at lower port is mounted at in feet
-                                angleOfCamera = 27; //angle limelight is mounted at relative to verticle in degrees, 28.8 was 
+        //PID
+        public final static double  //front flywheel
+                                    kLauncherP = 0.035,
+                                    kLauncherI = 0.000000002,
+                                    kLauncherD = 0,
+                                    kLauncherFF = .00017647,
+                                    kLauncherIZ = 0.0,
+                                    //back flywheel
+                                    kBackP = 0.00003,
+                                    kBackI = 0.0,
+                                    kBackD = 0.0,
+                                    kBackFF = 0.0,
+                                    kBackIZ = 0.0;
+
+
+        //Limelight
+        public static final double  heightOfLimelight = 21.5/12, //height limelight is mounted at in feet
+                                    heightUpper = 10, //TO BE CHANGED from 10!!! //height vision target at upper port is mounted at in feet
+                                    heightLower = 41.0/12.0, //TO BE CHANGED from 4!!! //height vision target at lower port is mounted at in feet
+                                    angleOfCamera = 27; //angle limelight is mounted at relative to verticle in degrees, 28.8 was 
 
     
     /**
@@ -115,11 +129,14 @@ public final class Constants {
      * @return The velocity of that the Talons understands that corresponds to the given RPM
      */
     public static double rpmToTalonVel(double RPM){
-        if(Math.abs(RPM) < 5000){
-            return RPM*(2048.0/600.0) *(24.0/36.0);//look into this
-        } else{
-            return 0.0;
-        }
+        //if(Math.abs(RPM) < 5000){
+            if(RPM == 0){
+                return 0;
+            }
+            return (RPM/*+500*/)*(2048.0/600.0); //*(24.0/36.0);//look into this
+        // } else{
+        //     return 0.0;
+        // }
     }
     /**
      * Converts the speed readable by the talons to the RPM
@@ -129,7 +146,7 @@ public final class Constants {
      * @return The velocity of that the Talons understands that corresponds to the given RPM
      */
     public static double talonVelToRPM(double vel){
-        return vel / ((2048.0/600.0) * (24.0/36.0));
+        return vel / ((2048.0/600.0)); //* (24.0/36.0));
     }
     
     public final static Gains kGains_Vel = new Gains (0.03, 0, 0, 0, 0, 0);//0.3,0.0006,0.2, 0, 0, 0);

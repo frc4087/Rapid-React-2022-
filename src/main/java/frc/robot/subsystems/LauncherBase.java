@@ -4,7 +4,11 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import edu.wpi.first.math.controller.PIDController;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 //import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -13,7 +17,9 @@ public class LauncherBase extends SubsystemBase {
 
   public final WPI_TalonFX rLaunchMotor = new WPI_TalonFX(Constants.RLAUNCH);
   public final WPI_TalonFX lLaunchMotor = new WPI_TalonFX(Constants.LLAUNCH);
-  public final PIDController PID = new PIDController(Constants.kLauncherP, Constants.kLauncherI, Constants.kLauncherD);
+  public final CANSparkMax blaunchMotor = new CANSparkMax(Constants.BLAUNCH, MotorType.kBrushless);
+  //public final PIDController PID = new PIDController(Constants.kLauncherP, Constants.kLauncherI, Constants.kLauncherD);
+  public final SparkMaxPIDController BackPID = blaunchMotor.getPIDController();
   //public final SparkMaxPIDController turretPID = launchMotor.getPIDController();
   
   //public DigitalInput hallEffect = new DigitalInput(Constants.HALL);
@@ -21,6 +27,15 @@ public class LauncherBase extends SubsystemBase {
   public LauncherBase() {
     rLaunchMotor.configFactoryDefault();
     lLaunchMotor.configFactoryDefault();
+    blaunchMotor.getEncoder().setVelocityConversionFactor(Constants.backLaunchPosConFac);
+    blaunchMotor.setIdleMode(IdleMode.kCoast);
+    BackPID.setP(Constants.kBackP);
+    BackPID.setI(Constants.kBackI);
+    BackPID.setD(Constants.kBackD);
+    BackPID.setFF(Constants.kBackFF);
+    BackPID.setIZone(Constants.kBackIZ);
+    BackPID.setOutputRange(-1, 1);
+    
 
     // rLaunchMotor.configNeutralDeadband(0.001);
     // lLaunchMotor.configNeutralDeadband(0.001);
@@ -43,24 +58,24 @@ public class LauncherBase extends SubsystemBase {
     rLaunchMotor.config_kF(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kF,Constants.kLaunchTimeoutMs);
     lLaunchMotor.config_kF(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kF,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.config_kP(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kP,Constants.kLaunchTimeoutMs);
-    lLaunchMotor.config_kP(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kP,Constants.kLaunchTimeoutMs);
+    rLaunchMotor.config_kP(Constants.kLaunchPIDIdx,Constants.kLauncherP,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.config_kP(Constants.kLaunchPIDIdx,Constants.kLauncherP,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.config_kI(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kI,Constants.kLaunchTimeoutMs);
-    lLaunchMotor.config_kI(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kI,Constants.kLaunchTimeoutMs);
+    rLaunchMotor.config_kI(Constants.kLaunchPIDIdx,Constants.kLauncherI,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.config_kI(Constants.kLaunchPIDIdx,Constants.kLauncherI,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.config_kD(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kD,Constants.kLaunchTimeoutMs);
-    lLaunchMotor.config_kD(Constants.kLaunchPIDIdx,Constants.kGains_Vel.kD,Constants.kLaunchTimeoutMs);
+    rLaunchMotor.config_kD(Constants.kLaunchPIDIdx,Constants.kLauncherD,Constants.kLaunchTimeoutMs);
+    lLaunchMotor.config_kD(Constants.kLaunchPIDIdx,Constants.kLauncherD,Constants.kLaunchTimeoutMs);
 
-    rLaunchMotor.set(ControlMode.PercentOutput, 0);
-    lLaunchMotor.set(ControlMode.PercentOutput, 0);
+    rLaunchMotor.set(ControlMode.Velocity, 0);
+    lLaunchMotor.set(ControlMode.Velocity, 0);
 
     rLaunchMotor.setNeutralMode(NeutralMode.Coast);
     lLaunchMotor.setNeutralMode(NeutralMode.Coast);
 
     rLaunchMotor.setInverted(true);
     lLaunchMotor.setInverted(false);
-    // turretPID.setP(Constants.kTurretP);
+    // BackPID.setP(Constants.kTurretP);
     // turretPID.setI(Constants.kTurretI);
     // turretPID.setD(Constants.kTurretD);
     // turretPID.setFF(Constants.kTurretFF);
@@ -82,14 +97,23 @@ public class LauncherBase extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  public void setRPM(double RPM){
-    rLaunchMotor.set(ControlMode.Velocity, Constants.rpmToTalonVel(-RPM));
-    lLaunchMotor.set(ControlMode.Velocity, Constants.rpmToTalonVel(-RPM));
+  public void setFrontRPM(double RPM){
+    rLaunchMotor.set(ControlMode.Velocity, Constants.rpmToTalonVel(-2*RPM));
+    lLaunchMotor.set(ControlMode.Velocity, Constants.rpmToTalonVel(-2*RPM));
+    //BackPID.setReference(RPM, ControlType.kVelocity);
   }
+
+  public void setBackRPM(double RPM){
+    // rLaunchMotor.set(ControlMode.Velocity, Constants.rpmToTalonVel(-RPM));
+    // lLaunchMotor.set(ControlMode.Velocity, Constants.rpmToTalonVel(-RPM));
+    BackPID.setReference(16*RPM, ControlType.kVelocity);
+  }
+
 
   public void setPO(double PO){
     rLaunchMotor.set(ControlMode.PercentOutput, Constants.rpmToTalonVel(-PO));
     lLaunchMotor.set(ControlMode.PercentOutput, Constants.rpmToTalonVel(-PO));
+    blaunchMotor.set(PO*4.0);
   }
 
   public double getRPM(){
